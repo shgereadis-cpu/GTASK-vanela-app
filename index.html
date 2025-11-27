@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G-Task Manager 🇪🇹</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <header class="top-header">
+            <h1 class="app-title">G-Task Manager</h1>
+            <div id="userBalance" class="balance-display">
+                <span class="balance-amount">0.00 ETB</span>
+            </div>
+        </header>
+
+        <main class="content-area" id="contentArea">
+            </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-page="tasks">✅ ተግባራት</button>
+            <button class="nav-item" data-page="balance">💰 ሂሳብ</button>
+            <button class="nav-item" data-page="withdraw">💳 ማውጫ</button>
+        </nav>
+    </div>
+
+    <script>
+        // 🚩 ወሳኝ፡ የቴሌግራም SDK ማስጀመሪያ
+        function initTelegramApp() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+                // የቴሌግራም ገጽታ ቀለምን ከኢትዮጵያዊው ዳራ ጋር ለማመሳሰል
+                const bgColor = '#F5F5F5'; 
+                window.Telegram.WebApp.setBackgroundColor(bgColor);
+            }
+        }
+        
+        // ገጾችን የሚቀይር ተግባር (በVanilla JS)
+        function renderPage(pageName) {
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = ''; // ያለውን ይዘት ባዶ ማድረግ
+
+            const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            document.querySelector(`.nav-item[data-page="${pageName}"]`).classList.add('active');
+
+            let contentHTML = '';
+
+            if (pageName === 'tasks') {
+                contentHTML = `
+                    <div class="card task-card accent-border">
+                        <h2>✅ የጂሜል አካውንት መክፈት</h2>
+                        <p>አዲስ የጂሜል አካውንት ከፍተው በተጠቀሱት መስፈርቶች መሠረት ያስረክቡ። ለእያንዳንዱ ተቀባይነት ላገኘ አካውንት **5.00 ETB** ያገኛሉ።</p>
+                        <div class="instructions">
+                            <h3>መመሪያዎች:</h3>
+                            <ul>
+                                <li>1. አካውንቱን ለመክፈት አዝራሩን ይጫኑ።</li>
+                                <li>2. አካውንቱ ከተከፈተ በኋላ "አስረክብ" የሚለውን ይጫኑና ኢሜይሉን/የይለፍ ቃሉን ይላኩ።</li>
+                                <li>3. ማረጋገጫ እስኪጠናቀቅ ይጠብቁ።</li>
+                            </ul>
+                        </div>
+                        <button class="primary-button">ጂሜል አካውንት ይክፈቱ</button>
+                    </div>
+                `;
+            } else if (pageName === 'balance') {
+                 contentHTML = `
+                    <div class="card">
+                        <h2>💰 የእርስዎ ሂሳብ</h2>
+                        <div class="balance-large">
+                            <strong>125.00</strong> <small>ETB</small>
+                        </div>
+                        <p class="history-title">የቅርብ ጊዜ እንቅስቃሴዎች:</p>
+                        <ul class="history-list">
+                            <li>+5.00 ETB (Task #123) - ዛሬ</li>
+                            <li>-50.00 ETB (ወጪ) - ትናንት</li>
+                            <li>+10.00 ETB (Task #125) - ከትናንት ወዲያ</li>
+                        </ul>
+                    </div>
+                 `;
+            } else if (pageName === 'withdraw') {
+                 contentHTML = `
+                    <div class="card">
+                        <h2>💳 ገንዘብ ማውጫ</h2>
+                        <p>ገንዘብዎን በቴሌ ብር ወይም በባንክ አካውንት ማውጣት ይችላሉ። ዝቅተኛው የማውጫ ገደብ **50.00 ETB** ነው።</p>
+                        <input type="number" placeholder="የማውጣት መጠን ያስገቡ (ለምሳሌ 50)">
+                        <button class="primary-button accent-bg">ማውጣት ይጠይቁ</button>
+                    </div>
+                 `;
+            }
+            contentArea.innerHTML = contentHTML;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTelegramApp();
+            
+            // የኔቪጌሽን አዝራር ክሊክ ተቆጣጣሪ
+            const navButtons = document.querySelectorAll('.bottom-nav .nav-item');
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const page = button.getAttribute('data-page');
+                    renderPage(page);
+                });
+            });
+
+            // መጀመሪያ ላይ የTasks ገጽን አሳይ
+            renderPage('tasks');
+        });
+    </script>
+</body>
+</html>
