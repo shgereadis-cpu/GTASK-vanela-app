@@ -450,3 +450,99 @@ input[type="number"] {
 .pending-task-item img {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
+/* --- Earn Page --- */
+.earn-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.earn-item {
+    background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+    border: 2px solid var(--secondary-color);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.earn-item h3 {
+    margin: 0 0 8px 0;
+    color: var(--primary-color);
+}
+
+.earn-item p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.earn-reward {
+    display: inline-block;
+    background: var(--primary-color);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+/* --- Invite Page --- */
+.invite-section {
+    margin-top: 20px;
+}
+
+.invite-stats {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-box {
+    flex: 1;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border: 2px solid var(--secondary-color);
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    display: block;
+    font-size: 13px;
+    color: #666;
+}
+
+.invite-action {
+    background: white;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.invite-action h3 {
+    color: var(--primary-color);
+    margin-top: 0;
+}
+
+.invite-link-box {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.invite-link-box input {
+    background: white;
+    border: 1px solid #ddd;
+    font-size: 12px;
+}

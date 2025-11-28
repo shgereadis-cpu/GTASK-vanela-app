@@ -25,6 +25,8 @@
 
         <nav class="bottom-nav" id="bottomNav">
             <button class="nav-item active" data-page="tasks">✅ ተግባራት</button>
+            <button class="nav-item" data-page="earn">🎁 ጨምር</button>
+            <button class="nav-item" data-page="invite">👥 ጋብዙ</button>
             <button class="nav-item" data-page="balance">💰 ሂሳብ</button>
             <button class="nav-item" data-page="withdraw">💳 ማውጫ</button>
         </nav>
@@ -124,6 +126,60 @@
                             <li>-50.00 ETB (ወጪ) - ትናንት</li>
                             <li>+10.00 ETB (Task #125) - ከትናንት ወዲያ</li>
                         </ul>
+                    </div>
+                 `;
+            } else if (pageName === 'earn') {
+                 contentHTML = `
+                    <div class="card">
+                        <h2>🎁 ተጨምር ስራ</h2>
+                        <p>ተጨምር ስራዎን እና ሌሎች ተግባራት ይወዱ:</p>
+                        <div class="earn-options">
+                            <div class="earn-item">
+                                <h3>📱 ዩቲዩብ ሳቦ ይስኩቡ</h3>
+                                <p>የቀናት ዝርዝር ሥራ ይስኩቡ</p>
+                                <span class="earn-reward">💰 10.00 ETB</span>
+                                <button class="primary-button" style="margin-top: 10px;">ይጀምሩ</button>
+                            </div>
+                            <div class="earn-item">
+                                <h3>📸 ግብረ-ሰናይ ጆክ ያስቀምጡ</h3>
+                                <p>ፍቅር ምግባር ያስቀምጡ ብርጌቶችን ለመመልከት</p>
+                                <span class="earn-reward">💰 7.50 ETB</span>
+                                <button class="primary-button" style="margin-top: 10px;">ይጀምሩ</button>
+                            </div>
+                            <div class="earn-item">
+                                <h3>🎮 ጨወታ ጠቀሙ</h3>
+                                <p>የእኛ ጨወታ ይጫወቱ እና ገንዘብ ስኩሙ</p>
+                                <span class="earn-reward">💰 5.00 - 20.00 ETB</span>
+                                <button class="primary-button" style="margin-top: 10px;">ይጀምሩ</button>
+                            </div>
+                        </div>
+                    </div>
+                 `;
+            } else if (pageName === 'invite') {
+                 contentHTML = `
+                    <div class="card">
+                        <h2>👥 ጋብዙ እና ስኩሙ</h2>
+                        <p>ጥሩ ወዳጆችሎ ጋብዙ እና ሁለቱም ሚዛን ሙቀት ይቀናሉ!</p>
+                        <div class="invite-section">
+                            <div class="invite-stats">
+                                <div class="stat-box">
+                                    <span class="stat-number">0</span>
+                                    <span class="stat-label">የወደቁ ወዳጆች</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-number">0.00 ETB</span>
+                                    <span class="stat-label">ሳቦ ገንዘብ</span>
+                                </div>
+                            </div>
+                            <div class="invite-action">
+                                <h3>🔗 የተጋባት ሊንክ</h3>
+                                <div class="invite-link-box">
+                                    <input type="text" value="https://t.me/YourBotName?start=user123" readonly class="form-input">
+                                    <button class="primary-button" style="margin-top: 10px;">📋 ይቅዳ</button>
+                                </div>
+                                <p style="font-size: 13px; color: #666; margin-top: 10px;">ወዳጆች ጋብዙ ሊንክ ስታጋብዙ እና ክምር ነው ሁለቱንም 0.50 ETB ዕንቅስቃሴ ሂስbence</p>
+                            </div>
+                        </div>
                     </div>
                  `;
             } else if (pageName === 'withdraw') {
