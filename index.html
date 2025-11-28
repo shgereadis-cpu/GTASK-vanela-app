@@ -118,15 +118,40 @@
                  contentHTML = `
                     <div class="card">
                         <h2>💰 የእርስዎ ሂሳብ</h2>
-                        <div class="balance-large">
-                            <strong>125.00</strong> <small>ETB</small>
+                        <div style="background: linear-gradient(135deg, rgba(29, 184, 84, 0.15) 0%, rgba(255, 184, 0, 0.08) 100%); border: 2px solid rgba(29, 184, 84, 0.4); border-radius: 16px; padding: 30px; text-align: center; margin: 20px 0;">
+                            <div style="font-size: 14px; color: #A0AEC0; margin-bottom: 12px; letter-spacing: 1px;">ጠቅላላ ሂሳብ</div>
+                            <div style="font-size: 42px; font-weight: 700; background: linear-gradient(135deg, #1DB854 0%, #FFB800 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0 2px 8px rgba(29, 184, 84, 0.2);">125.00 <span style="font-size: 22px;">ETB</span></div>
                         </div>
-                        <p class="history-title">የቅርብ ጊዜ እንቅስቃሴዎች:</p>
-                        <ul class="history-list">
-                            <li>+5.00 ETB (Task #123) - ዛሬ</li>
-                            <li>-50.00 ETB (ወጪ) - ትናንት</li>
-                            <li>+10.00 ETB (Task #125) - ከትናንት ወዲያ</li>
-                        </ul>
+                        <h3 style="color: #1DB854; margin-top: 24px; margin-bottom: 16px; font-size: 16px;">📊 የቅርብ ጊዜ እንቅስቃሴዎች:</h3>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10B981; border-radius: 8px; padding: 16px; transition: all 0.3s;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="color: #10B981; font-weight: 700; font-size: 15px;">+ 5.00 ETB</div>
+                                        <div style="color: #A0AEC0; font-size: 13px; margin-top: 4px;">Task #123</div>
+                                    </div>
+                                    <div style="color: #A0AEC0; font-size: 12px; background: rgba(16, 185, 129, 0.2); padding: 6px 12px; border-radius: 6px;">ዛሬ</div>
+                                </div>
+                            </div>
+                            <div style="background: rgba(255, 107, 91, 0.1); border-left: 4px solid #FF6B5B; border-radius: 8px; padding: 16px; transition: all 0.3s;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="color: #FF6B5B; font-weight: 700; font-size: 15px;">- 50.00 ETB</div>
+                                        <div style="color: #A0AEC0; font-size: 13px; margin-top: 4px;">ወጪ</div>
+                                    </div>
+                                    <div style="color: #A0AEC0; font-size: 12px; background: rgba(255, 107, 91, 0.2); padding: 6px 12px; border-radius: 6px;">ትናንት</div>
+                                </div>
+                            </div>
+                            <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10B981; border-radius: 8px; padding: 16px; transition: all 0.3s;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="color: #10B981; font-weight: 700; font-size: 15px;">+ 10.00 ETB</div>
+                                        <div style="color: #A0AEC0; font-size: 13px; margin-top: 4px;">Task #125</div>
+                                    </div>
+                                    <div style="color: #A0AEC0; font-size: 12px; background: rgba(16, 185, 129, 0.2); padding: 6px 12px; border-radius: 6px;">ከትናንት</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                  `;
             } else if (pageName === 'earn') {
