@@ -69,9 +69,10 @@
                     <h3>Gmail Credentials Pool</h3>
                     <div id="saveStatus" class="save-status" style="display: none;">✅ ተቀምጠዋል</div>
                     <div class="admin-form">
+                        <input type="text" id="adminFirstName" placeholder="ፈርስት ኔም" class="form-input">
+                        <input type="text" id="adminLastName" placeholder="ላስት ኔም" class="form-input">
                         <input type="email" id="adminEmail" placeholder="Gmail Address" class="form-input">
                         <input type="text" id="adminGmailPassword" placeholder="Password" class="form-input">
-                        <input type="email" id="adminRecoveryEmail" placeholder="Recovery Email" class="form-input">
                         <button class="primary-button" id="addCredentialBtn">✅ ጨምር</button>
                         <button class="primary-button" id="exportBtn" style="background-color: #FF9800; margin-top: 10px;">📥 ወረወር</button>
                     </div>
@@ -436,9 +437,9 @@
             const pool = JSON.parse(localStorage.getItem('gmailPool') || '[]');
             if (pool.length === 0) {
                 const samples = [
-                    { username: 'task.user.2024@gmail.com', password: 'SecurePass123', recovery: 'recovery.email@yahoo.com' },
-                    { username: 'gmail.task.001@gmail.com', password: 'Password456', recovery: 'backup.email@outlook.com' },
-                    { username: 'account.setup.001@gmail.com', password: 'TaskPass789', recovery: 'alternative@mail.com' }
+                    { firstName: 'John', lastName: 'Doe', username: 'task.user.2024@gmail.com', password: 'SecurePass123' },
+                    { firstName: 'Jane', lastName: 'Smith', username: 'gmail.task.001@gmail.com', password: 'Password456' },
+                    { firstName: 'Ahmed', lastName: 'Hassan', username: 'account.setup.001@gmail.com', password: 'TaskPass789' }
                 ];
                 localStorage.setItem('gmailPool', JSON.stringify(samples));
             }
@@ -485,22 +486,24 @@
 
             const addCredentialBtn = document.getElementById('addCredentialBtn');
             addCredentialBtn.addEventListener('click', () => {
+                const firstName = document.getElementById('adminFirstName').value.trim();
+                const lastName = document.getElementById('adminLastName').value.trim();
                 const email = document.getElementById('adminEmail').value.trim();
                 const password = document.getElementById('adminGmailPassword').value.trim();
-                const recovery = document.getElementById('adminRecoveryEmail').value.trim();
 
-                if (!email || !password || !recovery) {
+                if (!firstName || !lastName || !email || !password) {
                     alert('❌ ሁሉንም መስኮች ይሙሉ');
                     return;
                 }
 
                 const pool = JSON.parse(localStorage.getItem('gmailPool') || '[]');
-                pool.push({ username: email, password, recovery });
+                pool.push({ firstName, lastName, username: email, password });
                 localStorage.setItem('gmailPool', JSON.stringify(pool));
 
+                document.getElementById('adminFirstName').value = '';
+                document.getElementById('adminLastName').value = '';
                 document.getElementById('adminEmail').value = '';
                 document.getElementById('adminGmailPassword').value = '';
-                document.getElementById('adminRecoveryEmail').value = '';
                 updateCredentialsList();
                 showSaveStatus();
             });
@@ -706,7 +709,7 @@
                 item.className = 'credential-pool-item';
                 item.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <p style="margin: 5px 0;"><strong>#${idx + 1}</strong> - ${cred.username}</p>
+                        <p style="margin: 5px 0;"><strong>#${idx + 1}</strong> - ${cred.firstName} ${cred.lastName} (${cred.username})</p>
                         <button class="delete-btn" onclick="deleteCredential(${idx})" style="background: #ff5252; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">ሰርዥ</button>
                     </div>
                 `;
