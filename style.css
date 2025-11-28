@@ -218,3 +218,50 @@ input[type="number"] {
     padding: 2px 6px;
     border-radius: 3px;
 }
+
+/* --- ቅጹ ስቴይል --- */
+.task-form {
+    margin: 15px 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 14px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 8px rgba(0, 128, 0, 0.15);
+}
+
+.submission-container {
+    margin-top: 20px;
+    padding: 15px;
+}
+
+.submit-task-btn {
+    background-color: var(--primary-color);
+    width: 100%;
+}
+
+.submit-task-btn:active {
+    transform: scale(0.98);
+}

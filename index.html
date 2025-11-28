@@ -115,26 +115,62 @@
                     setTimeout(() => {
                         window.Telegram.WebApp.hideProgress();
 
-                        // 🔑 እዚህ ላይ ነው ወደ እውነተኛው Backend API ጥያቄ የሚላከው (ለምሳሌ: fetch('/api/get-task'))
-
-                        // ለሙከራ፣ ምናባዊ አካውንት እንፈጥራለን
-                        const assignedEmail = `new.task.${Math.floor(Math.random() * 1000)}@gmail.com`;
-                        const assignedPassword = 'DefaultPassword123';
-
                         activeTaskArea.innerHTML = `
                             <div class="card assigned-task-box">
                                 <h3 style="color: var(--primary-color);">ተግባር ተሰጥቶዎታል!</h3>
-                                <p>ይህንን መረጃ ተጠቅመው አዲስ አካውንት ይክፈቱ:</p>
-                                <ul class="task-details">
-                                    <li><strong>ኢሜይል:</strong> <span class="email-text">${assignedEmail}</span></li>
-                                    <li><strong>የይለፍ ቃል:</strong> <span class="password-text">${assignedPassword}</span></li>
-                                </ul>
-                                <p style="color: var(--accent-color); font-size: 14px; margin-top: 10px;">ይህንን አካውንት በመክፈት የማስረከቢያ ቅጹን ይጠቀሙ።</p>
+                                <p>የጂሜል አካውንቱን ይክፈቱ እና ከዚህ በታች ያለውን ቅጹ ይሙሉ:</p>
+                                <div class="task-form">
+                                    <div class="form-group">
+                                        <label for="gmailUsername">📧 ጂሜል ብስራ:</label>
+                                        <input type="text" id="gmailUsername" class="form-input" placeholder="ምሳሌ: john.doe">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="gmailPassword">🔐 የይለፍ ቃል:</label>
+                                        <input type="text" id="gmailPassword" class="form-input" placeholder="የይለፍ ቅሉ ያስገቡ">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="recoveryEmail">💌 ማገገሚያ ኢሜይል:</label>
+                                        <input type="email" id="recoveryEmail" class="form-input" placeholder="alternative@example.com">
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        submissionArea.innerHTML = `
+                            <div class="submission-container">
+                                <button class="primary-button submit-task-btn" id="submitTaskBtn">✓ አስረክብ</button>
                             </div>
                         `;
                         
                         // የማስረከቢያ ቅጹን እናሳይ
                         submissionArea.style.display = 'block';
+
+                        // አስረክብ ቁልፍ listener
+                        const submitBtn = document.getElementById('submitTaskBtn');
+                        if (submitBtn) {
+                            submitBtn.addEventListener('click', () => {
+                                const username = document.getElementById('gmailUsername').value.trim();
+                                const password = document.getElementById('gmailPassword').value.trim();
+                                const recovery = document.getElementById('recoveryEmail').value.trim();
+
+                                if (!username || !password || !recovery) {
+                                    alert('🚨 እባክዎ ሁሉንም መስኮች ይሙሉ!');
+                                    return;
+                                }
+
+                                // የቴሌግራም መጫኛን እናሳይ
+                                window.Telegram.WebApp.showProgress('የሚስተካከል ነው...');
+
+                                // Backend ጥያቄ (አሁን ሙከራ ነው)
+                                setTimeout(() => {
+                                    window.Telegram.WebApp.hideProgress();
+                                    alert('✅ ተወስዷል! ሂሳብዎ በ2-3 ሰዓታት ውስጥ ይጨመርበታል።');
+                                    
+                                    // ሂደቱን ዳግም ጀምር
+                                    renderPage('tasks');
+                                }, 1500);
+                            });
+                        }
                     
                     }, 2000); // 2 ሰከንድ ይጠብቃል
                 });
