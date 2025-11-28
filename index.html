@@ -309,17 +309,57 @@
                         
                         submissionArea.innerHTML = `
                             <div class="submission-container">
-                                <button class="primary-button submit-task-btn" id="submitTaskBtn">✓ አስረክብ</button>
+                                <div class="screenshot-section">
+                                    <h4>📸 ስክሪንሻት ይላኩ</h4>
+                                    <p style="font-size: 13px; color: #666;">የጂሜል አካውንቱ ከተከፈተ ስክሪንሻት ይላኩ</p>
+                                    <input type="file" id="screenshotInput" accept="image/*" class="form-input" style="margin: 10px 0;">
+                                    <div id="screenshotPreview" style="margin: 10px 0;"></div>
+                                </div>
+                                <button class="primary-button submit-task-btn" id="submitTaskBtn" disabled style="opacity: 0.5; cursor: not-allowed;">✓ አስረክብ</button>
                             </div>
                         `;
                         
                     // የማስረከቢያ ቅጹን እናሳይ
                     submissionArea.style.display = 'block';
 
-                    // አስረክብ ቁልፍ listener
+                    // ስክሪንሻት upload listener
+                    const screenshotInput = document.getElementById('screenshotInput');
                     const submitBtn = document.getElementById('submitTaskBtn');
+                    let screenshotUploaded = false;
+
+                    if (screenshotInput) {
+                        screenshotInput.addEventListener('change', (e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                                screenshotUploaded = true;
+                                const preview = document.getElementById('screenshotPreview');
+                                const reader = new FileReader();
+                                
+                                reader.onload = (event) => {
+                                    preview.innerHTML = `
+                                        <div class="screenshot-preview">
+                                            <img src="${event.target.result}" alt="Screenshot">
+                                            <p style="margin-top: 8px; color: #4CAF50; font-weight: 600;">✅ ${file.name} ተሞልቷል</p>
+                                        </div>
+                                    `;
+                                };
+                                reader.readAsDataURL(file);
+
+                                // Submit button enable
+                                submitBtn.disabled = false;
+                                submitBtn.style.opacity = '1';
+                                submitBtn.style.cursor = 'pointer';
+                            }
+                        });
+                    }
+
+                    // አስረክብ ቁልፍ listener
                     if (submitBtn) {
                         submitBtn.addEventListener('click', () => {
+                            if (!screenshotUploaded) {
+                                alert('❌ ስክሪንሻት ይላኩ');
+                                return;
+                            }
                             // Backend ጥያቄ - ሂሳብ ማስገቢያ
                             alert('✅ ተወስዷል!\n💰 5.00 ETB ሂሳብዎ ላይ ታክሏል።');
                             
