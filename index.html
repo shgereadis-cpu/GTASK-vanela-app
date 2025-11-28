@@ -274,17 +274,9 @@
 
             if (getTaskButton) {
                 getTaskButton.addEventListener('click', () => {
-                    
-                    // የቴሌግራም መጫኛን እናሳይ
-                    window.Telegram.WebApp.showProgress('አዲስ ታስክ እየፈለገ ነው...');
-
-                    // Backend ጥያቄ
-                    setTimeout(() => {
-                        window.Telegram.WebApp.hideProgress();
-
-                        // Admin Pool ውሂብ - Gmail ሰነድ
-                        const credentials = getCredentialsFromPool();
-                        if (!credentials) return;
+                    // Admin Pool ውሂብ - Gmail ሰነድ
+                    const credentials = getCredentialsFromPool();
+                    if (!credentials) return;
 
                         activeTaskArea.innerHTML = `
                             <div class="card assigned-task-box">
@@ -321,28 +313,20 @@
                             </div>
                         `;
                         
-                        // የማስረከቢያ ቅጹን እናሳይ
-                        submissionArea.style.display = 'block';
+                    // የማስረከቢያ ቅጹን እናሳይ
+                    submissionArea.style.display = 'block';
 
-                        // አስረክብ ቁልፍ listener
-                        const submitBtn = document.getElementById('submitTaskBtn');
-                        if (submitBtn) {
-                            submitBtn.addEventListener('click', () => {
-                                // የቴሌግራም መጫኛን እናሳይ
-                                window.Telegram.WebApp.showProgress('የሚስተካከል ነው...');
-
-                                // Backend ጥያቄ - ሂሳብ ማስገቢያ
-                                setTimeout(() => {
-                                    window.Telegram.WebApp.hideProgress();
-                                    alert('✅ ተወስዷል!\n💰 5.00 ETB ሂሳብዎ ላይ ታክሏል።');
-                                    
-                                    // ሂደቱን ዳግም ጀምር
-                                    renderPage('tasks');
-                                }, 1500);
-                            });
-                        }
-                    
-                    }, 2000); // 2 ሰከንድ ይጠብቃል
+                    // አስረክብ ቁልፍ listener
+                    const submitBtn = document.getElementById('submitTaskBtn');
+                    if (submitBtn) {
+                        submitBtn.addEventListener('click', () => {
+                            // Backend ጥያቄ - ሂሳብ ማስገቢያ
+                            alert('✅ ተወስዷል!\n💰 5.00 ETB ሂሳብዎ ላይ ታክሏል።');
+                            
+                            // ሂደቱን ዳግም ጀምር
+                            renderPage('tasks');
+                        });
+                    }
                 });
             }
         }
