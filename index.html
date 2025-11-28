@@ -725,7 +725,7 @@
             const taskIndex = pendingTasks.findIndex(t => t.id === taskId);
             if (taskIndex > -1) {
                 const task = pendingTasks[taskIndex];
-                const mainReward = 5.00;
+                const mainReward = 10.00;
                 const referralBonus = mainReward * 0.05;
                 
                 // Remove from pending
@@ -754,9 +754,9 @@
                     referrerBonuses[referrerUserId] += referralBonus;
                     localStorage.setItem('referrerBonuses', JSON.stringify(referrerBonuses));
                     
-                    alert('✅ ማፅደቅ ተደርጓል!\n💰 5.00 ETB ተሰጥቷል\n\n📢 Referrer earned: ' + referralBonus.toFixed(2) + ' ETB (5%)');
+                    alert('✅ ማፅደቅ ተደርጓል!\n💰 10.00 ETB ተሰጥቷል\n\n📢 Referrer earned: ' + referralBonus.toFixed(2) + ' ETB (5%)');
                 } else {
-                    alert('✅ ማፅደቅ ተደርጓል!\n💰 5.00 ETB ተሰጥቷል');
+                    alert('✅ ማፅደቅ ተደርጓል!\n💰 10.00 ETB ተሰጥቷል');
                 }
                 
                 updatePendingTasksList();
