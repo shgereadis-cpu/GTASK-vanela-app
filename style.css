@@ -171,3 +171,50 @@ input[type="number"] {
     font-weight: bold;
     border-top: 3px solid var(--secondary-color); /* ንቁ መሆኑን በቢጫ ማሳየት */
 }
+
+/* --- 4. ታስክ መመደቢያ ስቴይል --- */
+.assigned-task-box {
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+    border-left: 5px solid var(--primary-color) !important;
+    box-shadow: 0 4px 16px rgba(0, 128, 0, 0.15);
+}
+
+.assigned-task-box h3 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.task-details {
+    list-style: none;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    margin: 12px 0;
+    border-left: 4px solid var(--secondary-color);
+}
+
+.task-details li {
+    padding: 10px 0;
+    font-size: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.task-details li:last-child {
+    border-bottom: none;
+}
+
+.task-details strong {
+    color: var(--primary-color);
+    display: inline-block;
+    min-width: 100px;
+}
+
+.email-text,
+.password-text {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-family: monospace;
+    background: #f9f9f9;
+    padding: 2px 6px;
+    border-radius: 3px;
+}

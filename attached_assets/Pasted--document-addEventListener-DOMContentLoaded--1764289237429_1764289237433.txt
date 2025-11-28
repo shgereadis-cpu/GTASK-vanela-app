@@ -1,0 +1,64 @@
+// ... (ከ document.addEventListener('DOMContentLoaded', ...) በፊት ይጨምሩ)
+
+// 🚩 አዲስ ተግባር፡ ከክምችት ታስክ መውሰድ (Backend ጥያቄን ማስመሰል)
+function setupTaskAssignmentListener() {
+    const getTaskButton = document.getElementById('getNewTaskButton');
+    const activeTaskArea = document.getElementById('activeTaskArea');
+    const submissionArea = document.getElementById('submissionArea');
+
+    if (getTaskButton) {
+        getTaskButton.addEventListener('click', () => {
+            
+            // የቴሌግራም መጫኛን እናሳይ
+            window.Telegram.WebApp.showProgress('አዲስ ታስክ እየፈለገ ነው...');
+
+            // የBackend ጥያቄን በ 2 ሰከንድ እናስመስላለን
+            setTimeout(() => {
+                window.Telegram.WebApp.hideProgress();
+
+                // 🔑 እዚህ ላይ ነው ወደ እውነተኛው Backend API ጥያቄ የሚላከው (ለምሳሌ: fetch('/api/get-task'))
+
+                // ለሙከራ፣ ምናባዊ አካውንት እንፈጥራለን
+                const assignedEmail = `new.task.${Math.floor(Math.random() * 1000)}@gmail.com`;
+                const assignedPassword = 'DefaultPassword123';
+
+                activeTaskArea.innerHTML = `
+                    <div class="card assigned-task-box">
+                        <h3 style="color: var(--primary-color);">ተግባር ተሰጥቶዎታል!</h3>
+                        <p>ይህንን መረጃ ተጠቅመው አዲስ አካውንት ይክፈቱ:</p>
+                        <ul class="task-details">
+                            <li><strong>ኢሜይል:</strong> <span class="email-text">${assignedEmail}</span></li>
+                            <li><strong>የይለፍ ቃል:</strong> <span class="password-text">${assignedPassword}</span></li>
+                        </ul>
+                        <p style="color: var(--accent-color); font-size: 14px; margin-top: 10px;">ይህንን አካውንት በመክፈት የማስረከቢያ ቅጹን ይጠቀሙ።</p>
+                    </div>
+                `;
+                
+                // የማስረከቢያ ቅጹን እናሳይ
+                submissionArea.style.display = 'block';
+            
+            }, 2000); // 2 ሰከንድ ይጠብቃል
+        });
+    }
+}
+
+// ... (ከዚህ በታች ያለውን የDOMContentLoaded listener እናስተካክላለን)
+
+document.addEventListener('DOMContentLoaded', () => {
+    initTelegramApp();
+    
+    // የኔቪጌሽን አዝራር ክሊክ ተቆጣጣሪ
+    const navButtons = document.querySelectorAll('.bottom-nav .nav-item');
+    navButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const page = button.getAttribute('data-page');
+            renderPage(page);
+        });
+    });
+
+    // መጀመሪያ ላይ የTasks ገጽን አሳይ
+    renderPage('tasks');
+    
+    // 🚩 አዲስ፡ አዲስ የታስክ መውሰጃ listener እንጨምራለን
+    setupTaskAssignmentListener(); 
+});
