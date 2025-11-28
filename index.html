@@ -39,14 +39,16 @@
             </div>
             <div class="admin-panel" id="adminPanel" style="display: none;">
                 <h3>Gmail Credentials Pool</h3>
+                <div id="saveStatus" class="save-status" style="display: none;">✅ ተቀምጠዋል</div>
                 <div class="admin-form">
                     <input type="email" id="adminEmail" placeholder="Gmail Address" class="form-input">
                     <input type="text" id="adminGmailPassword" placeholder="Password" class="form-input">
                     <input type="email" id="adminRecoveryEmail" placeholder="Recovery Email" class="form-input">
-                    <button class="primary-button" id="addCredentialBtn">ጨምር</button>
+                    <button class="primary-button" id="addCredentialBtn">✅ ጨምር</button>
+                    <button class="primary-button" id="exportBtn" style="background-color: #FF9800; margin-top: 10px;">📥 ወረወር</button>
                 </div>
                 <div class="credentials-list">
-                    <h4>Available Credentials:</h4>
+                    <h4>Credentials Pool:</h4>
                     <div id="credentialsList"></div>
                 </div>
                 <button class="primary-button accent-bg" id="adminLogoutBtn" style="margin-top: 15px;">ውጣ</button>
@@ -187,7 +189,7 @@
                 const recovery = document.getElementById('adminRecoveryEmail').value.trim();
 
                 if (!email || !password || !recovery) {
-                    alert('All fields required');
+                    alert('❌ ሁሉንም መስኮች ይሙሉ');
                     return;
                 }
 
@@ -199,6 +201,20 @@
                 document.getElementById('adminGmailPassword').value = '';
                 document.getElementById('adminRecoveryEmail').value = '';
                 updateCredentialsList();
+                showSaveStatus();
+            });
+
+            const exportBtn = document.getElementById('exportBtn');
+            exportBtn.addEventListener('click', () => {
+                const pool = JSON.parse(localStorage.getItem('gmailPool') || '[]');
+                const dataStr = JSON.stringify(pool, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'gmail-credentials-backup.json';
+                link.click();
+                URL.revokeObjectURL(url);
             });
 
             document.getElementById('adminLogoutBtn').addEventListener('click', () => {
@@ -224,9 +240,30 @@
             pool.forEach((cred, idx) => {
                 const item = document.createElement('div');
                 item.className = 'credential-pool-item';
-                item.innerHTML = `<p><strong>#${idx + 1}</strong> - ${cred.username}</p>`;
+                item.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <p style="margin: 5px 0;"><strong>#${idx + 1}</strong> - ${cred.username}</p>
+                        <button class="delete-btn" onclick="deleteCredential(${idx})" style="background: #ff5252; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">ሰርዥ</button>
+                    </div>
+                `;
                 listDiv.appendChild(item);
             });
+        }
+
+        function deleteCredential(idx) {
+            const pool = JSON.parse(localStorage.getItem('gmailPool') || '[]');
+            pool.splice(idx, 1);
+            localStorage.setItem('gmailPool', JSON.stringify(pool));
+            updateCredentialsList();
+            showSaveStatus();
+        }
+
+        function showSaveStatus() {
+            const statusDiv = document.getElementById('saveStatus');
+            statusDiv.style.display = 'block';
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 2000);
         }
 
         // አዲስ ተግባር፡ ከክምችት ታስክ መውሰድ (Backend ጥያቄን ማስመስል)
