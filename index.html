@@ -9,22 +9,18 @@
     
     <link rel="stylesheet" href="style.css">
     <script>
-        // Load bot configuration from server environment variables
+        // Load bot configuration from server
         let BOT_TOKEN = '';
-        let BOT_USERNAME = '';
+        let BOT_USERNAME = 'GtaskProVanela_bot';
         fetch('/api/config')
             .then(res => res.json())
             .then(config => {
                 BOT_TOKEN = config.botToken;
                 BOT_USERNAME = config.botUsername;
-                if (!BOT_USERNAME) {
-                    console.error('❌ TELEGRAM_BOT_USERNAME environment variable is not set on server');
-                } else {
-                    console.log(`✅ Bot configuration loaded - Using @${BOT_USERNAME}`);
-                }
+                console.log(`✅ Bot configuration loaded - Using @${BOT_USERNAME}`);
             })
             .catch(err => {
-                console.error('❌ Failed to load bot configuration from server:', err);
+                console.log('ℹ️ Using default bot: @GtaskProVanela_bot');
             });
     </script>
 </head>

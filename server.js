@@ -5,12 +5,7 @@ const app = express();
 // Read environment variables
 const PORT = process.env.PORT || 5000;
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
-const TELEGRAM_BOT_USERNAME = process.env.TELEGRAM_BOT_USERNAME;
-
-// Warn if bot username is not set
-if (!TELEGRAM_BOT_USERNAME) {
-    console.warn('⚠️ WARNING: TELEGRAM_BOT_USERNAME environment variable is not set');
-}
+const TELEGRAM_BOT_USERNAME = 'GtaskProVanela_bot';
 
 // Serve static files
 app.use(express.static(path.join(__dirname, '/')));
