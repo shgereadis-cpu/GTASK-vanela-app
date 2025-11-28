@@ -107,6 +107,23 @@
                 // የቴሌግራም ገጽታ ቀለምን ከኢትዮጵያዊው ዳራ ጋር ለማመሳሰል
                 const bgColor = '#F5F5F5'; 
                 window.Telegram.WebApp.setBackgroundColor(bgColor);
+                
+                // Capture referral link start parameter from bot
+                const initData = window.Telegram.WebApp.initDataUnsafe;
+                if (initData && initData.start_param) {
+                    handleReferralFromBot(initData.start_param);
+                }
+            }
+        }
+
+        // Handle referral when user opens mini app from bot referral link
+        function handleReferralFromBot(startParam) {
+            const currentUserId = getUserId();
+            const storedReferrerId = localStorage.getItem('referrerId');
+            
+            // Only store referrer if this is a new user and they came from a referral link
+            if (!storedReferrerId && startParam.startsWith('user_')) {
+                localStorage.setItem('referrerId', startParam);
             }
         }
         
@@ -525,6 +542,16 @@
                 localStorage.setItem('userId', userId);
             }
             return userId;
+        }
+
+        // Apply referral commission when referred user completes task
+        function applyReferralCommission(taskReward) {
+            const referrerId = localStorage.getItem('referrerId');
+            if (!referrerId) return; // No referrer, no commission
+            
+            const commission = (taskReward * 0.05).toFixed(2); // 5% commission
+            const referralEarnings = parseFloat(localStorage.getItem(referrerId + '_referralEarnings') || '0');
+            localStorage.setItem(referrerId + '_referralEarnings', (referralEarnings + parseFloat(commission)).toFixed(2));
         }
 
         // Admin Panel Functions
