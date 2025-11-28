@@ -5,6 +5,12 @@ const app = express();
 // Read environment variables
 const PORT = process.env.PORT || 5000;
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_BOT_USERNAME = process.env.TELEGRAM_BOT_USERNAME;
+
+// Warn if bot username is not set
+if (!TELEGRAM_BOT_USERNAME) {
+    console.warn('⚠️ WARNING: TELEGRAM_BOT_USERNAME environment variable is not set');
+}
 
 // Serve static files
 app.use(express.static(path.join(__dirname, '/')));
@@ -13,7 +19,7 @@ app.use(express.static(path.join(__dirname, '/')));
 app.get('/api/config', (req, res) => {
     res.json({
         botToken: TELEGRAM_BOT_TOKEN,
-        botUsername: process.env.TELEGRAM_BOT_USERNAME || 'gtaskmanager_bot',
+        botUsername: TELEGRAM_BOT_USERNAME,
         timestamp: new Date().toISOString()
     });
 });
