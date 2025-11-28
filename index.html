@@ -167,13 +167,16 @@
             const adminLoginBtn = document.getElementById('adminLoginBtn');
             const adminPassword = document.getElementById('adminPassword');
             adminLoginBtn.addEventListener('click', () => {
-                if (adminPassword.value === ADMIN_PASSWORD) {
+                const enteredPassword = adminPassword.value.trim();
+                if (enteredPassword === ADMIN_PASSWORD) {
                     isAdminLoggedIn = true;
                     document.getElementById('adminLoginForm').style.display = 'none';
                     document.getElementById('adminPanel').style.display = 'block';
                     updateCredentialsList();
                 } else {
-                    alert('Invalid password');
+                    alert('❌ ወደ ተሳሳተ ፓስወርድ - admin123 ይጠቀሙ');
+                    adminPassword.value = '';
+                    adminPassword.focus();
                 }
             });
 
