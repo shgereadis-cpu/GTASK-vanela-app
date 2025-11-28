@@ -207,6 +207,8 @@
                     </div>
                  `;
             } else if (pageName === 'invite') {
+                 const userId = getUserId();
+                 const referralLink = `https://t.me/gtaskmanager_bot?start=${userId}`;
                  contentHTML = `
                     <div class="card">
                         <h2>👥 Invite Friends & Earn</h2>
@@ -225,8 +227,8 @@
                             <div class="invite-action">
                                 <h3>🔗 Your Referral Link</h3>
                                 <div class="invite-link-box">
-                                    <input type="text" value="https://t.me/YourBotName?start=user123" readonly class="form-input">
-                                    <button class="primary-button" style="margin-top: 10px;">📋 Copy Link</button>
+                                    <input type="text" id="referralLinkInput" value="${referralLink}" readonly class="form-input">
+                                    <button class="primary-button copy-referral-btn" style="margin-top: 10px;">📋 Copy Link</button>
                                 </div>
                                 <div style="background: rgba(29, 184, 84, 0.1); border-left: 4px solid #1DB854; padding: 16px; margin-top: 20px; border-radius: 8px;">
                                     <h4 style="color: #1DB854; margin: 0 0 12px 0; font-size: 14px;">📋 How It Works:</h4>
@@ -376,6 +378,25 @@
                     }
                 }, 100);
             }
+
+            // Handle Referral Link Copy
+            if (pageName === 'invite') {
+                setTimeout(() => {
+                    const copyBtn = document.querySelector('.copy-referral-btn');
+                    const referralInput = document.getElementById('referralLinkInput');
+                    if (copyBtn && referralInput) {
+                        copyBtn.addEventListener('click', () => {
+                            referralInput.select();
+                            document.execCommand('copy');
+                            const originalText = copyBtn.textContent;
+                            copyBtn.textContent = '✅ Copied!';
+                            setTimeout(() => {
+                                copyBtn.textContent = originalText;
+                            }, 2000);
+                        });
+                    }
+                }, 100);
+            }
         }
 
         // Admin State
@@ -495,6 +516,15 @@
             if (balanceAmount) {
                 balanceAmount.textContent = balance.toFixed(2) + ' ETB';
             }
+        }
+
+        function getUserId() {
+            let userId = localStorage.getItem('userId');
+            if (!userId) {
+                userId = 'user_' + Math.random().toString(36).substr(2, 9) + Date.now();
+                localStorage.setItem('userId', userId);
+            }
+            return userId;
         }
 
         // Admin Panel Functions
