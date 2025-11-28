@@ -183,6 +183,10 @@
                     </div>
                     <div id="submissionArea" style="display: none;"></div>
                 `;
+                
+                setTimeout(() => {
+                    setupTaskAssignmentListener();
+                }, 100);
             } else if (pageName === 'balance') {
                  contentHTML = `
                     <div class="card">
