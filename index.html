@@ -128,11 +128,23 @@
         let isAdminLoggedIn = false;
         const ADMIN_PASSWORD = 'admin123';
 
-        // Gmail ሰነድ ክምችት
+        // Gmail ሰነድ ክምችት - ምሳሌ ሰነድ ለሙከራ
+        function initializeSampleCredentials() {
+            const pool = JSON.parse(localStorage.getItem('gmailPool') || '[]');
+            if (pool.length === 0) {
+                const samples = [
+                    { username: 'task.user.2024@gmail.com', password: 'SecurePass123', recovery: 'recovery.email@yahoo.com' },
+                    { username: 'gmail.task.001@gmail.com', password: 'Password456', recovery: 'backup.email@outlook.com' },
+                    { username: 'account.setup.001@gmail.com', password: 'TaskPass789', recovery: 'alternative@mail.com' }
+                ];
+                localStorage.setItem('gmailPool', JSON.stringify(samples));
+            }
+        }
+
         function getCredentialsFromPool() {
             const pool = JSON.parse(localStorage.getItem('gmailPool') || '[]');
             if (pool.length === 0) {
-                alert('No credentials available');
+                alert('❌ ምንም ሰነድ አይገኙም - admin ክምችት ይሙሉ');
                 return null;
             }
             const randomIndex = Math.floor(Math.random() * pool.length);
@@ -297,6 +309,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initTelegramApp();
+            initializeSampleCredentials();
             initAdminPanel();
             
             // የኔቪጌሽን አዝራር ክሊክ ተቆጣጣሪ
