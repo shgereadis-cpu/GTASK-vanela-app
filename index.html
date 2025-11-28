@@ -300,21 +300,36 @@
             const pendingTasks = JSON.parse(localStorage.getItem('pendingTasks') || '[]');
             const taskIndex = pendingTasks.findIndex(t => t.id === taskId);
             if (taskIndex > -1) {
-                pendingTasks[taskIndex].status = 'approved';
+                const task = pendingTasks[taskIndex];
+                // Give reward to user
+                pendingTasks.splice(taskIndex, 1);
                 localStorage.setItem('pendingTasks', JSON.stringify(pendingTasks));
-                showSaveStatus();
+                
+                // Add to approved tasks for tracking
+                const approvedTasks = JSON.parse(localStorage.getItem('approvedTasks') || '[]');
+                approvedTasks.push({
+                    ...task,
+                    status: 'approved',
+                    approvedAt: new Date().toLocaleString('am-ET'),
+                    reward: 5.00
+                });
+                localStorage.setItem('approvedTasks', JSON.stringify(approvedTasks));
+                
+                alert('✅ ማፅደቅ ተደርጓል!\n💰 5.00 ETB ተሰጥቷል');
                 updatePendingTasksList();
             }
         }
 
         function rejectPendingTask(taskId) {
-            const pendingTasks = JSON.parse(localStorage.getItem('pendingTasks') || '[]');
-            const taskIndex = pendingTasks.findIndex(t => t.id === taskId);
-            if (taskIndex > -1) {
-                pendingTasks.splice(taskIndex, 1);
-                localStorage.setItem('pendingTasks', JSON.stringify(pendingTasks));
-                showSaveStatus();
-                updatePendingTasksList();
+            if (confirm('❌ ይህን ታስክ ውድቅ ስትል እርግጠኛ ነህ?')) {
+                const pendingTasks = JSON.parse(localStorage.getItem('pendingTasks') || '[]');
+                const taskIndex = pendingTasks.findIndex(t => t.id === taskId);
+                if (taskIndex > -1) {
+                    pendingTasks.splice(taskIndex, 1);
+                    localStorage.setItem('pendingTasks', JSON.stringify(pendingTasks));
+                    alert('✅ ታስክ ውድቅ ተደርጓል');
+                    updatePendingTasksList();
+                }
             }
         }
 
