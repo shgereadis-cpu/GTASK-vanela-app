@@ -1,8 +1,13 @@
+#!/usr/bin/env python3
+"""
+Telegram bot for G-Task Manager
+Runs in polling mode for local development, webhook mode for production
+"""
 import os
+import sys
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes
-import sys
 
 # Enable logging
 logging.basicConfig(
