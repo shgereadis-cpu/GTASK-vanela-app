@@ -38,19 +38,32 @@
                 <button class="primary-button" id="adminLoginBtn">ግባ</button>
             </div>
             <div class="admin-panel" id="adminPanel" style="display: none;">
-                <h3>Gmail Credentials Pool</h3>
-                <div id="saveStatus" class="save-status" style="display: none;">✅ ተቀምጠዋል</div>
-                <div class="admin-form">
-                    <input type="email" id="adminEmail" placeholder="Gmail Address" class="form-input">
-                    <input type="text" id="adminGmailPassword" placeholder="Password" class="form-input">
-                    <input type="email" id="adminRecoveryEmail" placeholder="Recovery Email" class="form-input">
-                    <button class="primary-button" id="addCredentialBtn">✅ ጨምር</button>
-                    <button class="primary-button" id="exportBtn" style="background-color: #FF9800; margin-top: 10px;">📥 ወረወር</button>
+                <div class="admin-tabs">
+                    <button class="admin-tab active" data-tab="credentials">🔑 Credentials</button>
+                    <button class="admin-tab" data-tab="pending">⏳ Pending Tasks</button>
                 </div>
-                <div class="credentials-list">
-                    <h4>Credentials Pool:</h4>
-                    <div id="credentialsList"></div>
+
+                <div class="admin-tab-content" id="credentialsTab" style="display: block;">
+                    <h3>Gmail Credentials Pool</h3>
+                    <div id="saveStatus" class="save-status" style="display: none;">✅ ተቀምጠዋል</div>
+                    <div class="admin-form">
+                        <input type="email" id="adminEmail" placeholder="Gmail Address" class="form-input">
+                        <input type="text" id="adminGmailPassword" placeholder="Password" class="form-input">
+                        <input type="email" id="adminRecoveryEmail" placeholder="Recovery Email" class="form-input">
+                        <button class="primary-button" id="addCredentialBtn">✅ ጨምር</button>
+                        <button class="primary-button" id="exportBtn" style="background-color: #FF9800; margin-top: 10px;">📥 ወረወር</button>
+                    </div>
+                    <div class="credentials-list">
+                        <h4>Credentials Pool:</h4>
+                        <div id="credentialsList"></div>
+                    </div>
                 </div>
+
+                <div class="admin-tab-content" id="pendingTab" style="display: none;">
+                    <h3>⏳ Pending Tasks</h3>
+                    <div id="pendingTasksList"></div>
+                </div>
+
                 <button class="primary-button accent-bg" id="adminLogoutBtn" style="margin-top: 15px;">ውጣ</button>
             </div>
             <button class="close-modal-btn" id="closeAdminModal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
@@ -129,6 +142,7 @@
         // Admin State
         let isAdminLoggedIn = false;
         const ADMIN_PASSWORD = 'admin123';
+        let currentUserIdForTask = null;
 
         // Gmail ሰነድ ክምችት - ምሳሌ ሰነድ ለሙከራ
         function initializeSampleCredentials() {
@@ -231,6 +245,77 @@
                 document.getElementById('adminLoginForm').style.display = 'block';
                 document.getElementById('adminPanel').style.display = 'none';
             });
+
+            // Tab switching
+            const adminTabs = document.querySelectorAll('.admin-tab');
+            adminTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    adminTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    document.querySelectorAll('.admin-tab-content').forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    if (tabName === 'credentials') {
+                        document.getElementById('credentialsTab').style.display = 'block';
+                    } else if (tabName === 'pending') {
+                        document.getElementById('pendingTab').style.display = 'block';
+                        updatePendingTasksList();
+                    }
+                });
+            });
+        }
+
+        function updatePendingTasksList() {
+            const pendingTasks = JSON.parse(localStorage.getItem('pendingTasks') || '[]');
+            const listDiv = document.getElementById('pendingTasksList');
+            listDiv.innerHTML = '';
+
+            if (pendingTasks.length === 0) {
+                listDiv.innerHTML = '<p style="text-align: center; color: #999;">No pending tasks</p>';
+                return;
+            }
+
+            pendingTasks.forEach((task, idx) => {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = 'pending-task-item';
+                taskDiv.innerHTML = `
+                    <div style="margin-bottom: 15px; border: 2px solid #FFD700; padding: 15px; border-radius: 8px;">
+                        <h4 style="margin-top: 0; color: var(--primary-color);">#${idx + 1} - ${task.email}</h4>
+                        <p style="font-size: 13px; margin: 5px 0;">⏰ ${task.timestamp}</p>
+                        <img src="${task.screenshot}" style="max-width: 100%; max-height: 200px; border-radius: 6px; margin: 10px 0;">
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button onclick="approvePendingTask('${task.id}')" class="primary-button" style="flex: 1; margin: 0;">✅ ማፅደቅ</button>
+                            <button onclick="rejectPendingTask('${task.id}')" class="primary-button accent-bg" style="flex: 1; margin: 0; background: #f44336;">❌ ውድቅ</button>
+                        </div>
+                    </div>
+                `;
+                listDiv.appendChild(taskDiv);
+            });
+        }
+
+        function approvePendingTask(taskId) {
+            const pendingTasks = JSON.parse(localStorage.getItem('pendingTasks') || '[]');
+            const taskIndex = pendingTasks.findIndex(t => t.id === taskId);
+            if (taskIndex > -1) {
+                pendingTasks[taskIndex].status = 'approved';
+                localStorage.setItem('pendingTasks', JSON.stringify(pendingTasks));
+                showSaveStatus();
+                updatePendingTasksList();
+            }
+        }
+
+        function rejectPendingTask(taskId) {
+            const pendingTasks = JSON.parse(localStorage.getItem('pendingTasks') || '[]');
+            const taskIndex = pendingTasks.findIndex(t => t.id === taskId);
+            if (taskIndex > -1) {
+                pendingTasks.splice(taskIndex, 1);
+                localStorage.setItem('pendingTasks', JSON.stringify(pendingTasks));
+                showSaveStatus();
+                updatePendingTasksList();
+            }
         }
 
         function updateCredentialsList() {
@@ -360,11 +445,28 @@
                                 alert('❌ ስክሪንሻት ይላኩ');
                                 return;
                             }
-                            // Backend ጥያቄ - ሂሳብ ማስገቢያ
-                            alert('✅ ተወስዷል!\n💰 5.00 ETB ሂሳብዎ ላይ ታክሏል።');
                             
-                            // ሂደቱን ዳግም ጀምር
-                            renderPage('tasks');
+                            // Save to pending tasks
+                            const screenshot = document.getElementById('screenshotInput').files[0];
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const pendingTasks = JSON.parse(localStorage.getItem('pendingTasks') || '[]');
+                                const taskId = Date.now().toString();
+                                pendingTasks.push({
+                                    id: taskId,
+                                    email: credentials.username,
+                                    password: credentials.password,
+                                    recovery: credentials.recovery,
+                                    screenshot: e.target.result,
+                                    timestamp: new Date().toLocaleString('am-ET'),
+                                    status: 'pending'
+                                });
+                                localStorage.setItem('pendingTasks', JSON.stringify(pendingTasks));
+                                
+                                alert('✅ ተወስዷል!\n⏳ Admin ማፅደቅ ይጠብቁ...');
+                                renderPage('tasks');
+                            };
+                            reader.readAsDataURL(screenshot);
                         });
                     }
                 });
