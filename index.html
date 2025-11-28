@@ -344,9 +344,23 @@
                     const dailyCheckinBtn = document.querySelector('.daily-checkin-btn');
                     if (dailyCheckinBtn) {
                         dailyCheckinBtn.addEventListener('click', () => {
+                            const lastCheckinTime = localStorage.getItem('lastDailyCheckinTime');
+                            const now = Date.now();
+                            const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+                            
+                            if (lastCheckinTime) {
+                                const timeSinceLastCheckin = now - parseInt(lastCheckinTime);
+                                if (timeSinceLastCheckin < TWENTY_FOUR_HOURS) {
+                                    const hoursRemaining = Math.ceil((TWENTY_FOUR_HOURS - timeSinceLastCheckin) / (60 * 60 * 1000));
+                                    alert(`❌ ቀጠሮ ጊዜ አልደረሰም\n\n⏳ በ${hoursRemaining} ሰአታት ሞክር`);
+                                    return;
+                                }
+                            }
+                            
                             const reward = Math.floor(Math.random() * 3) + 1;
                             const userBalance = parseFloat(localStorage.getItem('userBalance') || '0');
                             localStorage.setItem('userBalance', (userBalance + reward).toFixed(2));
+                            localStorage.setItem('lastDailyCheckinTime', now.toString());
                             
                             const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
                             transactions.push({
