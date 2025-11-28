@@ -11,13 +11,18 @@
     <script>
         // Load bot configuration from server
         let BOT_TOKEN = '';
+        let BOT_USERNAME = 'gtaskmanager_bot'; // Default fallback
         fetch('/api/config')
             .then(res => res.json())
             .then(config => {
                 BOT_TOKEN = config.botToken;
-                console.log('✅ Bot configuration loaded');
+                BOT_USERNAME = config.botUsername || 'gtaskmanager_bot';
+                console.log(`✅ Bot configuration loaded - Using @${BOT_USERNAME}`);
             })
-            .catch(err => console.log('ℹ️ Config endpoint not available - running in static mode'));
+            .catch(err => {
+                console.log('ℹ️ Config endpoint not available - using default bot username');
+                BOT_USERNAME = 'gtaskmanager_bot';
+            });
     </script>
 </head>
 <body>
@@ -236,7 +241,7 @@
                  `;
             } else if (pageName === 'invite') {
                  const userId = getUserId();
-                 const referralLink = `https://t.me/gtaskmanager_bot?start=${userId}`;
+                 const referralLink = `https://t.me/${BOT_USERNAME}?start=${userId}`;
                  contentHTML = `
                     <div class="card">
                         <h2>👥 Invite Friends & Earn</h2>

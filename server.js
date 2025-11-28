@@ -13,6 +13,7 @@ app.use(express.static(path.join(__dirname, '/')));
 app.get('/api/config', (req, res) => {
     res.json({
         botToken: TELEGRAM_BOT_TOKEN,
+        botUsername: process.env.TELEGRAM_BOT_USERNAME || 'gtaskmanager_bot',
         timestamp: new Date().toISOString()
     });
 });
