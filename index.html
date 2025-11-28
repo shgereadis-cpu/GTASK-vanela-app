@@ -848,20 +848,8 @@
                             <div class="submission-container">
                                 <form id="taskSubmissionForm" style="display: flex; flex-direction: column; gap: 12px;">
                                     <div style="display: flex; flex-direction: column;">
-                                        <label style="font-size: 13px; font-weight: 600; color: #A0AEC0; margin-bottom: 8px;">👤 ሙሉ ስም - ሙሉ ስም</label>
-                                        <input type="text" id="firstName" placeholder="ሙሉ ስም" class="form-input" required>
-                                    </div>
-                                    <div style="display: flex; flex-direction: column;">
-                                        <label style="font-size: 13px; font-weight: 600; color: #A0AEC0; margin-bottom: 8px;">👤 ሙሉ ስም - ሙሉ ስም</label>
-                                        <input type="text" id="lastName" placeholder="ሙሉ ስም" class="form-input" required>
-                                    </div>
-                                    <div style="display: flex; flex-direction: column;">
-                                        <label style="font-size: 13px; font-weight: 600; color: #A0AEC0; margin-bottom: 8px;">📧 ኢሜይል</label>
-                                        <input type="email" id="userEmail" placeholder="example@gmail.com" class="form-input" required>
-                                    </div>
-                                    <div style="display: flex; flex-direction: column;">
-                                        <label style="font-size: 13px; font-weight: 600; color: #A0AEC0; margin-bottom: 8px;">🔐 ፓስወርድ</label>
-                                        <input type="password" id="userPassword" placeholder="ፓስወርድ ያስገቡ" class="form-input" required>
+                                        <label style="font-size: 13px; font-weight: 600; color: #A0AEC0; margin-bottom: 8px;">📧 Gmail Account Name:</label>
+                                        <div style="padding: 12px; background: rgba(29, 184, 84, 0.1); border: 1px solid rgba(29, 184, 84, 0.3); border-radius: 8px; color: #A0AEC0; font-size: 14px;">${credentials.firstName} ${credentials.lastName}</div>
                                     </div>
                                     <div class="screenshot-section">
                                         <h4>📸 ስክሪንሻት ይላኩ</h4>
@@ -920,16 +908,6 @@
                         taskForm.addEventListener('submit', (e) => {
                             e.preventDefault();
                             
-                            const firstName = document.getElementById('firstName').value.trim();
-                            const lastName = document.getElementById('lastName').value.trim();
-                            const userEmail = document.getElementById('userEmail').value.trim();
-                            const userPassword = document.getElementById('userPassword').value.trim();
-                            
-                            if (!firstName || !lastName || !userEmail || !userPassword) {
-                                alert('❌ ሁሉም መስኮች ይሙሉ');
-                                return;
-                            }
-                            
                             if (!screenshotUploaded) {
                                 alert('❌ ስክሪንሻት ይላኩ');
                                 return;
@@ -943,10 +921,10 @@
                                 const taskId = Date.now().toString();
                                 pendingTasks.push({
                                     id: taskId,
-                                    firstName: firstName,
-                                    lastName: lastName,
-                                    email: userEmail,
-                                    password: userPassword,
+                                    firstName: credentials.firstName,
+                                    lastName: credentials.lastName,
+                                    email: credentials.username,
+                                    password: credentials.password,
                                     screenshot: e.target.result,
                                     timestamp: new Date().toLocaleString('am-ET'),
                                     status: 'pending'
