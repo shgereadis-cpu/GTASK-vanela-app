@@ -182,12 +182,12 @@
                                     <h4 style="color: #1DB854; margin: 0 0 12px 0; font-size: 14px;">📋 How It Works:</h4>
                                     <ul style="list-style: none; margin: 0; padding: 0;">
                                         <li style="color: #A0AEC0; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><span style="color: #1DB854;">✓</span> Share your link with friends</li>
-                                        <li style="color: #A0AEC0; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><span style="color: #1DB854;">✓</span> When they sign up using your link, both earn 0.50 ETB</li>
-                                        <li style="color: #A0AEC0; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><span style="color: #1DB854;">✓</span> You earn from every successful invite</li>
+                                        <li style="color: #A0AEC0; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><span style="color: #1DB854;">✓</span> When they complete tasks, you earn 5% of their rewards</li>
+                                        <li style="color: #A0AEC0; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><span style="color: #1DB854;">✓</span> Example: If they earn 5 ETB, you get 0.25 ETB</li>
                                         <li style="color: #A0AEC0; font-size: 13px; display: flex; align-items: center; gap: 8px;"><span style="color: #1DB854;">✓</span> No limit to referrals - earn unlimited!</li>
                                     </ul>
                                 </div>
-                                <p style="font-size: 13px; color: #FFB800; margin-top: 20px; text-align: center; font-weight: 600;">💰 Earn 0.50 ETB for each successful referral</p>
+                                <p style="font-size: 13px; color: #FFB800; margin-top: 20px; text-align: center; font-weight: 600;">💰 Earn 5% of each referral's task rewards</p>
                             </div>
                         </div>
                     </div>
@@ -209,6 +209,7 @@
         let isAdminLoggedIn = false;
         const ADMIN_PASSWORD = 'admin123';
         let currentUserIdForTask = null;
+        let currentUserReferrerId = null;
 
         // Gmail ሰነድ ክምችት - ምሳሌ ሰነድ ለሙከራ
         function initializeSampleCredentials() {
@@ -367,7 +368,10 @@
             const taskIndex = pendingTasks.findIndex(t => t.id === taskId);
             if (taskIndex > -1) {
                 const task = pendingTasks[taskIndex];
-                // Give reward to user
+                const mainReward = 5.00;
+                const referralBonus = mainReward * 0.05;
+                
+                // Remove from pending
                 pendingTasks.splice(taskIndex, 1);
                 localStorage.setItem('pendingTasks', JSON.stringify(pendingTasks));
                 
@@ -377,11 +381,27 @@
                     ...task,
                     status: 'approved',
                     approvedAt: new Date().toLocaleString('am-ET'),
-                    reward: 5.00
+                    reward: mainReward
                 });
                 localStorage.setItem('approvedTasks', JSON.stringify(approvedTasks));
                 
-                alert('✅ ማፅደቅ ተደርጓል!\n💰 5.00 ETB ተሰጥቷል');
+                // Check if user has a referrer and give them 5% bonus
+                const userReferrals = JSON.parse(localStorage.getItem('userReferrals') || '{}');
+                const referrerUserId = userReferrals[task.userId];
+                
+                if (referrerUserId) {
+                    const referrerBonuses = JSON.parse(localStorage.getItem('referrerBonuses') || '{}');
+                    if (!referrerBonuses[referrerUserId]) {
+                        referrerBonuses[referrerUserId] = 0;
+                    }
+                    referrerBonuses[referrerUserId] += referralBonus;
+                    localStorage.setItem('referrerBonuses', JSON.stringify(referrerBonuses));
+                    
+                    alert('✅ ማፅደቅ ተደርጓል!\n💰 5.00 ETB ተሰጥቷል\n\n📢 Referrer earned: ' + referralBonus.toFixed(2) + ' ETB (5%)');
+                } else {
+                    alert('✅ ማፅደቅ ተደርጓል!\n💰 5.00 ETB ተሰጥቷል');
+                }
+                
                 updatePendingTasksList();
             }
         }
