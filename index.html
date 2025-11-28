@@ -139,7 +139,19 @@
             // Only store referrer if this is a new user and they came from a referral link
             if (!storedReferrerId && startParam.startsWith('user_')) {
                 localStorage.setItem('referrerId', startParam);
+                
+                // Increment the referrer's friend count
+                const referrerFriendsCount = parseInt(localStorage.getItem(startParam + '_friendsCount') || '0');
+                localStorage.setItem(startParam + '_friendsCount', (referrerFriendsCount + 1).toString());
             }
+        }
+
+        // Get referral stats for current user
+        function getReferralStats() {
+            const userId = getUserId();
+            const friendsCount = parseInt(localStorage.getItem(userId + '_friendsCount') || '0');
+            const referralEarnings = parseFloat(localStorage.getItem(userId + '_referralEarnings') || '0');
+            return { friendsCount, referralEarnings };
         }
         
         // ገጾችን የሚቀይር ተግባር (በVanilla JS)
@@ -241,6 +253,7 @@
             } else if (pageName === 'invite') {
                  const userId = getUserId();
                  const referralLink = `https://t.me/${BOT_USERNAME}?start=${userId}`;
+                 const stats = getReferralStats();
                  contentHTML = `
                     <div class="card">
                         <h2>👥 Invite Friends & Earn</h2>
@@ -248,11 +261,11 @@
                         <div class="invite-section">
                             <div class="invite-stats">
                                 <div class="stat-box">
-                                    <span class="stat-number">0</span>
+                                    <span class="stat-number">${stats.friendsCount}</span>
                                     <span class="stat-label">👥 Friends Invited</span>
                                 </div>
                                 <div class="stat-box">
-                                    <span class="stat-number">0.00 ETB</span>
+                                    <span class="stat-number">${stats.referralEarnings.toFixed(2)} ETB</span>
                                     <span class="stat-label">💸 Referral Earnings</span>
                                 </div>
                             </div>
