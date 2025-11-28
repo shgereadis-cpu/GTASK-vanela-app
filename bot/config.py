@@ -2,12 +2,8 @@ import os
 
 # Telegram Bot Configuration
 BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
-MINI_APP_URL = os.getenv('MINI_APP_URL', 'https://example.com')
+MINI_APP_URL = os.getenv('MINI_APP_URL', 'https://replit.com')  # Will be replaced with actual Replit domain
 ADMIN_CHAT_ID = os.getenv('ADMIN_CHAT_ID', '')
-
-# Server Configuration
-PORT = int(os.getenv('PORT', 5000))
-HOST = '0.0.0.0'
 
 # Task Configuration
 TASK_TIMEOUT = 3600  # 1 hour in seconds
