@@ -1,0 +1,20 @@
+{
+  "name": "g-task-manager",
+  "version": "1.0.0",
+  "description": "G-Task Manager Telegram Mini App with Ethiopian theme",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "telegram",
+    "mini-app",
+    "task-manager"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

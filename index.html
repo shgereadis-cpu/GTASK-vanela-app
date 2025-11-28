@@ -8,6 +8,17 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <link rel="stylesheet" href="style.css">
+    <script>
+        // Load bot configuration from server
+        let BOT_TOKEN = '';
+        fetch('/api/config')
+            .then(res => res.json())
+            .then(config => {
+                BOT_TOKEN = config.botToken;
+                console.log('✅ Bot configuration loaded');
+            })
+            .catch(err => console.log('ℹ️ Config endpoint not available - running in static mode'));
+    </script>
 </head>
 <body>
 
