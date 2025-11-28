@@ -14,7 +14,7 @@
     <div id="app-container">
         
         <header class="top-header">
-            <h1 class="app-title">G-Task Manager</h1>
+            <h1 class="app-title" id="appTitle">G-Task Manager</h1>
             <div id="userBalance" class="balance-display">
                 <span class="balance-amount">0.00 ETB</span>
             </div>
@@ -23,11 +23,36 @@
         <main class="content-area" id="contentArea">
             </main>
 
-        <nav class="bottom-nav">
+        <nav class="bottom-nav" id="bottomNav">
             <button class="nav-item active" data-page="tasks">✅ ተግባራት</button>
             <button class="nav-item" data-page="balance">💰 ሂሳብ</button>
             <button class="nav-item" data-page="withdraw">💳 ማውጫ</button>
         </nav>
+    </div>
+
+    <div id="adminModalOverlay" class="admin-modal-overlay" style="display: none;">
+        <div class="admin-modal">
+            <h2>🔐 Admin Panel</h2>
+            <div class="admin-login-form" id="adminLoginForm" style="display: none;">
+                <input type="password" id="adminPassword" placeholder="Admin Password" class="form-input">
+                <button class="primary-button" id="adminLoginBtn">ግባ</button>
+            </div>
+            <div class="admin-panel" id="adminPanel" style="display: none;">
+                <h3>Gmail Credentials Pool</h3>
+                <div class="admin-form">
+                    <input type="email" id="adminEmail" placeholder="Gmail Address" class="form-input">
+                    <input type="text" id="adminGmailPassword" placeholder="Password" class="form-input">
+                    <input type="email" id="adminRecoveryEmail" placeholder="Recovery Email" class="form-input">
+                    <button class="primary-button" id="addCredentialBtn">ጨምር</button>
+                </div>
+                <div class="credentials-list">
+                    <h4>Available Credentials:</h4>
+                    <div id="credentialsList"></div>
+                </div>
+                <button class="primary-button accent-bg" id="adminLogoutBtn" style="margin-top: 15px;">ውጣ</button>
+            </div>
+            <button class="close-modal-btn" id="closeAdminModal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
+        </div>
     </div>
 
     <script>
@@ -99,17 +124,94 @@
             contentArea.innerHTML = contentHTML;
         }
 
-        // 🚩 Gmail ሰነድ ማመንጨት (ሚኒአፕ ሌሎች ውሂብ)
-        function generateGmailCredentials() {
-            const num = Math.floor(Math.random() * 100000);
-            const domains = ['gmail.com', 'googlemail.com'];
-            const domain = domains[Math.floor(Math.random() * domains.length)];
-            const username = `user.task.${num}@${domain}`;
-            const password = `Pass${Math.random().toString(36).substr(2, 8).toUpperCase()}${Math.floor(Math.random() * 100)}`;
-            const recoveryEmails = ['recovery.001@yahoo.com', 'backup.task@outlook.com', 'alternative.email@mail.com'];
-            const recovery = recoveryEmails[Math.floor(Math.random() * recoveryEmails.length)];
-            
-            return { username, password, recovery };
+        // Admin State
+        let isAdminLoggedIn = false;
+        const ADMIN_PASSWORD = 'admin123';
+
+        // Gmail ሰነድ ክምችት
+        function getCredentialsFromPool() {
+            const pool = JSON.parse(localStorage.getItem('gmailPool') || '[]');
+            if (pool.length === 0) {
+                alert('No credentials available');
+                return null;
+            }
+            const randomIndex = Math.floor(Math.random() * pool.length);
+            return pool[randomIndex];
+        }
+
+        // Admin Panel Functions
+        function initAdminPanel() {
+            const appTitle = document.getElementById('appTitle');
+            let clickCount = 0;
+            appTitle.addEventListener('click', () => {
+                clickCount++;
+                if (clickCount === 3) {
+                    document.getElementById('adminModalOverlay').style.display = 'flex';
+                    document.getElementById('adminLoginForm').style.display = 'block';
+                    clickCount = 0;
+                }
+            });
+
+            const adminLoginBtn = document.getElementById('adminLoginBtn');
+            const adminPassword = document.getElementById('adminPassword');
+            adminLoginBtn.addEventListener('click', () => {
+                if (adminPassword.value === ADMIN_PASSWORD) {
+                    isAdminLoggedIn = true;
+                    document.getElementById('adminLoginForm').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'block';
+                    updateCredentialsList();
+                } else {
+                    alert('Invalid password');
+                }
+            });
+
+            const addCredentialBtn = document.getElementById('addCredentialBtn');
+            addCredentialBtn.addEventListener('click', () => {
+                const email = document.getElementById('adminEmail').value.trim();
+                const password = document.getElementById('adminGmailPassword').value.trim();
+                const recovery = document.getElementById('adminRecoveryEmail').value.trim();
+
+                if (!email || !password || !recovery) {
+                    alert('All fields required');
+                    return;
+                }
+
+                const pool = JSON.parse(localStorage.getItem('gmailPool') || '[]');
+                pool.push({ username: email, password, recovery });
+                localStorage.setItem('gmailPool', JSON.stringify(pool));
+
+                document.getElementById('adminEmail').value = '';
+                document.getElementById('adminGmailPassword').value = '';
+                document.getElementById('adminRecoveryEmail').value = '';
+                updateCredentialsList();
+            });
+
+            document.getElementById('adminLogoutBtn').addEventListener('click', () => {
+                isAdminLoggedIn = false;
+                document.getElementById('adminLoginForm').style.display = 'block';
+                document.getElementById('adminPanel').style.display = 'none';
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminModalOverlay').style.display = 'none';
+            });
+
+            document.getElementById('closeAdminModal').addEventListener('click', () => {
+                document.getElementById('adminModalOverlay').style.display = 'none';
+                isAdminLoggedIn = false;
+                document.getElementById('adminLoginForm').style.display = 'block';
+                document.getElementById('adminPanel').style.display = 'none';
+            });
+        }
+
+        function updateCredentialsList() {
+            const pool = JSON.parse(localStorage.getItem('gmailPool') || '[]');
+            const listDiv = document.getElementById('credentialsList');
+            listDiv.innerHTML = '';
+            pool.forEach((cred, idx) => {
+                const item = document.createElement('div');
+                item.className = 'credential-pool-item';
+                item.innerHTML = `<p><strong>#${idx + 1}</strong> - ${cred.username}</p>`;
+                listDiv.appendChild(item);
+            });
         }
 
         // አዲስ ተግባር፡ ከክምችት ታስክ መውሰድ (Backend ጥያቄን ማስመስል)
@@ -128,8 +230,9 @@
                     setTimeout(() => {
                         window.Telegram.WebApp.hideProgress();
 
-                        // ሚኒአፕ ውሂብ - Gmail ሰነድ
-                        const credentials = generateGmailCredentials();
+                        // Admin Pool ውሂብ - Gmail ሰነድ
+                        const credentials = getCredentialsFromPool();
+                        if (!credentials) return;
 
                         activeTaskArea.innerHTML = `
                             <div class="card assigned-task-box">
@@ -194,6 +297,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initTelegramApp();
+            initAdminPanel();
             
             // የኔቪጌሽን አዝራር ክሊክ ተቆጣጣሪ
             const navButtons = document.querySelectorAll('.bottom-nav .nav-item');
@@ -207,7 +311,7 @@
             // መጀመሪያ ላይ የTasks ገጽን አሳይ
             renderPage('tasks');
             
-            // 🚩 አዲስ፡ አዲስ የታስክ መውሰጃ listener እንጨምራለን
+            // አዲስ የታስክ መውሰጃ listener
             setupTaskAssignmentListener();
         });
     </script>
