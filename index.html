@@ -195,7 +195,7 @@
                                 <h3>✅ Daily Check-in</h3>
                                 <p>በየቀኑ አፕሊኬሽኑ ይጎብኙ</p>
                                 <span class="earn-reward">💰 1.00 - 3.00 ETB</span>
-                                <button class="primary-button" style="margin-top: 10px;">ይጀምሩ</button>
+                                <button class="primary-button daily-checkin-btn" style="margin-top: 10px;">ይጀምሩ</button>
                             </div>
                             <div class="earn-item">
                                 <h3>💬 ቻናል ጆይን</h3>
@@ -338,6 +338,26 @@
                     if (channelJoinBtn) {
                         channelJoinBtn.addEventListener('click', () => {
                             openChannelJoinModal();
+                        });
+                    }
+                    
+                    const dailyCheckinBtn = document.querySelector('.daily-checkin-btn');
+                    if (dailyCheckinBtn) {
+                        dailyCheckinBtn.addEventListener('click', () => {
+                            const reward = Math.floor(Math.random() * 3) + 1;
+                            const userBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+                            localStorage.setItem('userBalance', (userBalance + reward).toFixed(2));
+                            
+                            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+                            transactions.push({
+                                type: 'daily_checkin',
+                                amount: reward,
+                                date: new Date().toLocaleString('am-ET')
+                            });
+                            localStorage.setItem('transactions', JSON.stringify(transactions));
+                            
+                            alert(`✅ ውድድር!\n\n💚 ${reward.toFixed(2)} ETB ታክተዋል`);
+                            updateUserBalance();
                         });
                     }
                 }, 100);
