@@ -131,7 +131,7 @@
                             <h3>መመሪያዎች:</h3>
                             <ul>
                                 <li>1. አካውንቱን ለመክፈት አዝራሩን ይጫኑ።</li>
-                                <li>2. አካውንቱ ከተከፈተ በኋላ "አስረክብ" የሚለውን ይጫኑና ኢሜይሉን/የይለፍ ቃሉን ይላኩ።</li>
+                                <li>2. አካውንቱ ከተከፈተ በኋላ "አስረክብ" የሚለውን ይጫኑና የኢሜይሉን ስም/ስክሪንሻት ይላኩ።</li>
                                 <li>3. ማረጋገጫ እስኪጠናቀቅ ይጠብቁ።</li>
                             </ul>
                         </div>
@@ -473,6 +473,14 @@
             }
             const randomIndex = Math.floor(Math.random() * pool.length);
             return pool[randomIndex];
+        }
+
+        function updateUserBalance() {
+            const balance = parseFloat(localStorage.getItem('userBalance') || '0');
+            const balanceAmount = document.querySelector('.balance-amount');
+            if (balanceAmount) {
+                balanceAmount.textContent = balance.toFixed(2) + ' ETB';
+            }
         }
 
         // Admin Panel Functions
