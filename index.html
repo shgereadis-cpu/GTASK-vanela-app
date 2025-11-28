@@ -44,6 +44,7 @@
                 <div class="admin-tabs">
                     <button class="admin-tab active" data-tab="credentials">🔑 Credentials</button>
                     <button class="admin-tab" data-tab="pending">⏳ Pending Tasks</button>
+                    <button class="admin-tab" data-tab="withdrawals">💳 Withdrawals</button>
                 </div>
 
                 <div class="admin-tab-content" id="credentialsTab" style="display: block;">
@@ -65,6 +66,11 @@
                 <div class="admin-tab-content" id="pendingTab" style="display: none;">
                     <h3>⏳ Pending Tasks</h3>
                     <div id="pendingTasksList"></div>
+                </div>
+
+                <div class="admin-tab-content" id="withdrawalsTab" style="display: none;">
+                    <h3>💳 Withdrawal Requests</h3>
+                    <div id="withdrawalsList"></div>
                 </div>
 
                 <button class="primary-button accent-bg" id="adminLogoutBtn" style="margin-top: 15px;">ውጣ</button>
@@ -261,6 +267,50 @@
                  `;
             }
             contentArea.innerHTML = contentHTML;
+
+            // Handle withdrawal form submission
+            if (pageName === 'withdraw') {
+                setTimeout(() => {
+                    const withdrawForm = document.getElementById('withdrawForm');
+                    if (withdrawForm) {
+                        withdrawForm.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            
+                            const amount = document.getElementById('withdrawAmount').value;
+                            const method = document.getElementById('withdrawMethod').value;
+                            const owner = document.getElementById('accountOwner').value;
+                            const accountNum = document.getElementById('accountNumber').value;
+
+                            if (!amount || !method || !owner || !accountNum) {
+                                alert('❌ ሁሉም መስኮች ይሙሉ');
+                                return;
+                            }
+
+                            if (parseFloat(amount) < 50) {
+                                alert('❌ ዝቅተኛው 50 ETB ነው');
+                                return;
+                            }
+
+                            const withdrawalRequest = {
+                                id: 'wd_' + Date.now(),
+                                amount: parseFloat(amount),
+                                method: method,
+                                owner: owner,
+                                accountNumber: accountNum,
+                                requestedAt: new Date().toLocaleString('am-ET'),
+                                status: 'pending'
+                            };
+
+                            const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+                            withdrawals.push(withdrawalRequest);
+                            localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawals));
+
+                            alert('✅ ክፍያ ጥያቄዎ ተሰርዝዋል!\n\n⏳ ከ1-24 ሰአታት ይፈፀማሉ');
+                            withdrawForm.reset();
+                        });
+                    }
+                }, 100);
+            }
         }
 
         // Admin State
@@ -388,6 +438,9 @@
                     } else if (tabName === 'pending') {
                         document.getElementById('pendingTab').style.display = 'block';
                         updatePendingTasksList();
+                    } else if (tabName === 'withdrawals') {
+                        document.getElementById('withdrawalsTab').style.display = 'block';
+                        updateWithdrawalsList();
                     }
                 });
             });
@@ -473,6 +526,61 @@
                     localStorage.setItem('pendingTasks', JSON.stringify(pendingTasks));
                     alert('✅ ታስክ ውድቅ ተደርጓል');
                     updatePendingTasksList();
+                }
+            }
+        }
+
+        function updateWithdrawalsList() {
+            const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+            const listDiv = document.getElementById('withdrawalsList');
+            listDiv.innerHTML = '';
+
+            if (withdrawals.length === 0) {
+                listDiv.innerHTML = '<p style="text-align: center; color: #999;">No withdrawal requests</p>';
+                return;
+            }
+
+            withdrawals.forEach((wd, idx) => {
+                const wdDiv = document.createElement('div');
+                wdDiv.className = 'pending-task-item';
+                const methodName = wd.method === 'telebirr' ? '📱 Telebirr' : '🏦 CBE';
+                wdDiv.innerHTML = `
+                    <div style="margin-bottom: 15px; border: 2px solid #FFB800; padding: 15px; border-radius: 8px;">
+                        <h4 style="margin-top: 0; color: #FFB800;">#${idx + 1} - ${wd.owner}</h4>
+                        <p style="font-size: 13px; margin: 5px 0;">💰 Amount: ${wd.amount} ETB</p>
+                        <p style="font-size: 13px; margin: 5px 0;">📱 Method: ${methodName}</p>
+                        <p style="font-size: 13px; margin: 5px 0;">🔢 Account: ${wd.accountNumber}</p>
+                        <p style="font-size: 13px; margin: 5px 0;">⏰ ${wd.requestedAt}</p>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button onclick="approveWithdrawal('${wd.id}')" class="primary-button" style="flex: 1; margin: 0;">✅ Approve</button>
+                            <button onclick="rejectWithdrawal('${wd.id}')" class="primary-button accent-bg" style="flex: 1; margin: 0; background: #f44336;">❌ Reject</button>
+                        </div>
+                    </div>
+                `;
+                listDiv.appendChild(wdDiv);
+            });
+        }
+
+        function approveWithdrawal(wdId) {
+            const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+            const index = withdrawals.findIndex(w => w.id === wdId);
+            if (index > -1) {
+                withdrawals[index].status = 'approved';
+                localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawals));
+                alert('✅ ክፍያ ለሰጠው!');
+                updateWithdrawalsList();
+            }
+        }
+
+        function rejectWithdrawal(wdId) {
+            if (confirm('❌ ይህን ክፍያ ውድቅ ስትል እርግጠኛ ነህ?')) {
+                const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+                const index = withdrawals.findIndex(w => w.id === wdId);
+                if (index > -1) {
+                    withdrawals.splice(index, 1);
+                    localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawals));
+                    alert('✅ ክፍያ ውድቅ ተደርጓል');
+                    updateWithdrawalsList();
                 }
             }
         }
