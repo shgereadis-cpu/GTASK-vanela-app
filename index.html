@@ -771,13 +771,31 @@
                         
                         submissionArea.innerHTML = `
                             <div class="submission-container">
-                                <div class="screenshot-section">
-                                    <h4>📸 ስክሪንሻት ይላኩ</h4>
-                                    <p style="font-size: 13px; color: #666;">የጂሜል አካውንቱ ከተከፈተ ስክሪንሻት ይላኩ</p>
-                                    <input type="file" id="screenshotInput" accept="image/*" class="form-input" style="margin: 10px 0;">
-                                    <div id="screenshotPreview" style="margin: 10px 0;"></div>
-                                </div>
-                                <button class="primary-button submit-task-btn" id="submitTaskBtn" disabled style="opacity: 0.5; cursor: not-allowed;">✓ አስረክብ</button>
+                                <form id="taskSubmissionForm" style="display: flex; flex-direction: column; gap: 12px;">
+                                    <div style="display: flex; flex-direction: column;">
+                                        <label style="font-size: 13px; font-weight: 600; color: #A0AEC0; margin-bottom: 8px;">👤 ሙሉ ስም - ሙሉ ስም</label>
+                                        <input type="text" id="firstName" placeholder="ሙሉ ስም" class="form-input" required>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column;">
+                                        <label style="font-size: 13px; font-weight: 600; color: #A0AEC0; margin-bottom: 8px;">👤 ሙሉ ስም - ሙሉ ስም</label>
+                                        <input type="text" id="lastName" placeholder="ሙሉ ስም" class="form-input" required>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column;">
+                                        <label style="font-size: 13px; font-weight: 600; color: #A0AEC0; margin-bottom: 8px;">📧 ኢሜይል</label>
+                                        <input type="email" id="userEmail" placeholder="example@gmail.com" class="form-input" required>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column;">
+                                        <label style="font-size: 13px; font-weight: 600; color: #A0AEC0; margin-bottom: 8px;">🔐 ፓስወርድ</label>
+                                        <input type="password" id="userPassword" placeholder="ፓስወርድ ያስገቡ" class="form-input" required>
+                                    </div>
+                                    <div class="screenshot-section">
+                                        <h4>📸 ስክሪንሻት ይላኩ</h4>
+                                        <p style="font-size: 13px; color: #666;">የጂሜል አካውንቱ ከተከፈተ ስክሪንሻት ይላኩ</p>
+                                        <input type="file" id="screenshotInput" accept="image/*" class="form-input" style="margin: 10px 0;" required>
+                                        <div id="screenshotPreview" style="margin: 10px 0;"></div>
+                                    </div>
+                                    <button type="submit" class="primary-button submit-task-btn" id="submitTaskBtn" disabled style="opacity: 0.5; cursor: not-allowed;">✓ አስረክብ</button>
+                                </form>
                             </div>
                         `;
                         
@@ -787,6 +805,7 @@
                     // ስክሪንሻት upload listener
                     const screenshotInput = document.getElementById('screenshotInput');
                     const submitBtn = document.getElementById('submitTaskBtn');
+                    const taskForm = document.getElementById('taskSubmissionForm');
                     let screenshotUploaded = false;
 
                     if (screenshotInput) {
@@ -815,9 +834,21 @@
                         });
                     }
 
-                    // አስረክብ ቁልፍ listener
-                    if (submitBtn) {
-                        submitBtn.addEventListener('click', () => {
+                    // አስረክብ ዝርዝር listener
+                    if (taskForm) {
+                        taskForm.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            
+                            const firstName = document.getElementById('firstName').value.trim();
+                            const lastName = document.getElementById('lastName').value.trim();
+                            const userEmail = document.getElementById('userEmail').value.trim();
+                            const userPassword = document.getElementById('userPassword').value.trim();
+                            
+                            if (!firstName || !lastName || !userEmail || !userPassword) {
+                                alert('❌ ሁሉም መስኮች ይሙሉ');
+                                return;
+                            }
+                            
                             if (!screenshotUploaded) {
                                 alert('❌ ስክሪንሻት ይላኩ');
                                 return;
@@ -831,9 +862,10 @@
                                 const taskId = Date.now().toString();
                                 pendingTasks.push({
                                     id: taskId,
-                                    email: credentials.username,
-                                    password: credentials.password,
-                                    recovery: credentials.recovery,
+                                    firstName: firstName,
+                                    lastName: lastName,
+                                    email: userEmail,
+                                    password: userPassword,
                                     screenshot: e.target.result,
                                     timestamp: new Date().toLocaleString('am-ET'),
                                     status: 'pending'
