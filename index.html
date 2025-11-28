@@ -99,7 +99,20 @@
             contentArea.innerHTML = contentHTML;
         }
 
-        // 🚩 አዲስ ተግባር፡ ከክምችት ታስክ መውሰድ (Backend ጥያቄን ማስመስል)
+        // 🚩 Gmail ሰነድ ማመንጨት (ሚኒአፕ ሌሎች ውሂብ)
+        function generateGmailCredentials() {
+            const num = Math.floor(Math.random() * 100000);
+            const domains = ['gmail.com', 'googlemail.com'];
+            const domain = domains[Math.floor(Math.random() * domains.length)];
+            const username = `user.task.${num}@${domain}`;
+            const password = `Pass${Math.random().toString(36).substr(2, 8).toUpperCase()}${Math.floor(Math.random() * 100)}`;
+            const recoveryEmails = ['recovery.001@yahoo.com', 'backup.task@outlook.com', 'alternative.email@mail.com'];
+            const recovery = recoveryEmails[Math.floor(Math.random() * recoveryEmails.length)];
+            
+            return { username, password, recovery };
+        }
+
+        // አዲስ ተግባር፡ ከክምችት ታስክ መውሰድ (Backend ጥያቄን ማስመስል)
         function setupTaskAssignmentListener() {
             const getTaskButton = document.getElementById('getNewTaskButton');
             const activeTaskArea = document.getElementById('activeTaskArea');
@@ -111,27 +124,38 @@
                     // የቴሌግራም መጫኛን እናሳይ
                     window.Telegram.WebApp.showProgress('አዲስ ታስክ እየፈለገ ነው...');
 
-                    // የBackend ጥያቄን በ 2 ሰከንድ እናስመስላለን
+                    // Backend ጥያቄ
                     setTimeout(() => {
                         window.Telegram.WebApp.hideProgress();
 
+                        // ሚኒአፕ ውሂብ - Gmail ሰነድ
+                        const credentials = generateGmailCredentials();
+
                         activeTaskArea.innerHTML = `
                             <div class="card assigned-task-box">
-                                <h3 style="color: var(--primary-color);">ተግባር ተሰጥቶዎታል!</h3>
-                                <p>የጂሜል አካውንቱን ይክፈቱ እና ከዚህ በታች ያለውን ቅጹ ይሙሉ:</p>
-                                <div class="task-form">
-                                    <div class="form-group">
-                                        <label for="gmailUsername">📧 ጂሜል ብስራ:</label>
-                                        <input type="text" id="gmailUsername" class="form-input" placeholder="ምሳሌ: john.doe">
+                                <h3 style="color: var(--primary-color);">✅ ተግባር ተሰጥቶዎታል!</h3>
+                                <p>ከዚህ በታች ያሉትን ሰነድ ተጠቅመው <strong>አዲስ የጂሜል አካውንት ይክፈቱ</strong>:</p>
+                                <div class="credentials-display">
+                                    <div class="credential-item">
+                                        <label>📧 ጂሜል ሰነድ:</label>
+                                        <div class="credential-value">${credentials.username}</div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="gmailPassword">🔐 የይለፍ ቃል:</label>
-                                        <input type="text" id="gmailPassword" class="form-input" placeholder="የይለፍ ቅሉ ያስገቡ">
+                                    <div class="credential-item">
+                                        <label>🔐 የይለፍ ቃል:</label>
+                                        <div class="credential-value">${credentials.password}</div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="recoveryEmail">💌 ማገገሚያ ኢሜይል:</label>
-                                        <input type="email" id="recoveryEmail" class="form-input" placeholder="alternative@example.com">
+                                    <div class="credential-item">
+                                        <label>💌 ማገገሚያ ኢሜይል:</label>
+                                        <div class="credential-value">${credentials.recovery}</div>
                                     </div>
+                                </div>
+                                <div class="instruction-box">
+                                    <p><strong>📝 መመሪያ:</strong></p>
+                                    <ol>
+                                        <li>ላይ ያለ ጂሜል ሰነድ ይገልገሉ አዲስ አካውንት ለመክፈት</li>
+                                        <li>ማገገሚያ ኢሜይልን ደግሞ ይጠቀሙ</li>
+                                        <li>አካውንቱ ከተከፈተ በኋላ "አስረክብ" ይጫኑ</li>
+                                    </ol>
                                 </div>
                             </div>
                         `;
@@ -149,22 +173,13 @@
                         const submitBtn = document.getElementById('submitTaskBtn');
                         if (submitBtn) {
                             submitBtn.addEventListener('click', () => {
-                                const username = document.getElementById('gmailUsername').value.trim();
-                                const password = document.getElementById('gmailPassword').value.trim();
-                                const recovery = document.getElementById('recoveryEmail').value.trim();
-
-                                if (!username || !password || !recovery) {
-                                    alert('🚨 እባክዎ ሁሉንም መስኮች ይሙሉ!');
-                                    return;
-                                }
-
                                 // የቴሌግራም መጫኛን እናሳይ
                                 window.Telegram.WebApp.showProgress('የሚስተካከል ነው...');
 
-                                // Backend ጥያቄ (አሁን ሙከራ ነው)
+                                // Backend ጥያቄ - ሂሳብ ማስገቢያ
                                 setTimeout(() => {
                                     window.Telegram.WebApp.hideProgress();
-                                    alert('✅ ተወስዷል! ሂሳብዎ በ2-3 ሰዓታት ውስጥ ይጨመርበታል።');
+                                    alert('✅ ተወስዷል!\n💰 5.00 ETB ሂሳብዎ ላይ ታክሏል።');
                                     
                                     // ሂደቱን ዳግም ጀምር
                                     renderPage('tasks');
