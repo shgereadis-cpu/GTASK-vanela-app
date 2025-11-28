@@ -26,6 +26,6 @@ app.get('*', (req, res) => {
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`✅ G-Task Manager server running on http://0.0.0.0:${PORT}`);
+    console.log(`✅ G-Task server running on http://0.0.0.0:${PORT}`);
     console.log(`🤖 Bot Token Status: ${TELEGRAM_BOT_TOKEN ? 'Loaded ✅' : 'Not set - set TELEGRAM_BOT_TOKEN env var'}`);
 });
