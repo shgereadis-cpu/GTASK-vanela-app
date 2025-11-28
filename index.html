@@ -350,6 +350,8 @@
         let currentUserReferrerId = null;
         const CHANNEL_USERNAME = 'gtaskmanager'; // Channel to join
         const CHANNEL_JOIN_REWARD = 3.00;
+        const TASK_TIMEOUT_MS = 60 * 60 * 1000; // 1 hour in milliseconds
+        let taskTimerInterval = null;
 
         // Channel Join Modal Functions
         function openChannelJoinModal() {
@@ -728,6 +730,59 @@
             }, 2000);
         }
 
+        // Task Timer Functions
+        function startTaskTimer() {
+            // Clear previous timer
+            if (taskTimerInterval) clearInterval(taskTimerInterval);
+
+            taskTimerInterval = setInterval(() => {
+                const activeTask = JSON.parse(localStorage.getItem('activeTask') || '{}');
+                if (!activeTask.assignedAt) return;
+
+                const elapsedTime = Date.now() - activeTask.assignedAt;
+                const remainingTime = TASK_TIMEOUT_MS - elapsedTime;
+                
+                const timerDiv = document.getElementById('taskTimer');
+                if (timerDiv) {
+                    if (remainingTime > 0) {
+                        const minutes = Math.floor(remainingTime / 60000);
+                        const seconds = Math.floor((remainingTime % 60000) / 1000);
+                        timerDiv.textContent = `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    } else {
+                        // Task expired
+                        clearInterval(taskTimerInterval);
+                        returnTaskToPool();
+                    }
+                }
+            }, 1000);
+        }
+
+        function returnTaskToPool() {
+            const activeTask = JSON.parse(localStorage.getItem('activeTask') || '{}');
+            if (activeTask.credentials) {
+                const pool = JSON.parse(localStorage.getItem('gmailPool') || '[]');
+                pool.push(activeTask.credentials);
+                localStorage.setItem('gmailPool', JSON.stringify(pool));
+            }
+            
+            localStorage.removeItem('activeTask');
+            if (taskTimerInterval) clearInterval(taskTimerInterval);
+            
+            alert('❌ ተግባሩ ወደ ክምችት ተመላሽ ሆናል!\n\n⏰ 1 ሰአት ያልጠናቀቁ በትክክል');
+            renderPage('tasks');
+        }
+
+        function checkForExpiredTask() {
+            const activeTask = JSON.parse(localStorage.getItem('activeTask') || '{}');
+            if (activeTask.assignedAt) {
+                const elapsedTime = Date.now() - activeTask.assignedAt;
+                if (elapsedTime > TASK_TIMEOUT_MS) {
+                    returnTaskToPool();
+                    return;
+                }
+            }
+        }
+
         // አዲስ ተግባር፡ ከክምችት ታስክ መውሰድ (Backend ጥያቄን ማስመስል)
         function setupTaskAssignmentListener() {
             const getTaskButton = document.getElementById('getNewTaskButton');
@@ -740,9 +795,22 @@
                     const credentials = getCredentialsFromPool();
                     if (!credentials) return;
 
+                    // Store active task with timer
+                    const activeTask = {
+                        credentials: credentials,
+                        assignedAt: Date.now()
+                    };
+                    localStorage.setItem('activeTask', JSON.stringify(activeTask));
+
                         activeTaskArea.innerHTML = `
                             <div class="card assigned-task-box">
-                                <h3 style="color: var(--primary-color);">✅ ተግባር ተሰጥቶዎታል!</h3>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                    <h3 style="color: var(--primary-color); margin: 0;">✅ ተግባር ተሰጥቶዎታል!</h3>
+                                    <div style="background: rgba(255, 107, 91, 0.2); border: 1px solid #FF6B5B; border-radius: 6px; padding: 8px 12px; font-weight: 600; color: #FF6B5B;" id="taskTimer">⏱️ 60:00</div>
+                                </div>
+                                <div style="background: rgba(255, 184, 0, 0.1); border-left: 4px solid #FFB800; padding: 12px; margin-bottom: 16px; border-radius: 6px;">
+                                    <p style="margin: 0; font-size: 13px; color: #A0AEC0;"><strong style="color: #FFB800;">⚠️ ማስታወሻ:</strong> ይህን ተግባር ለ<strong>1 ሰአት</strong> ሊያጠናቅቅ ይችላሉ። ጊዜው ከተነሳ ተግባሩ ወደ ክምችት ይመለሳል።</p>
+                                </div>
                                 <p>ከዚህ በታች ያሉትን ሰነድ ተጠቅመው <strong>አዲስ የጂሜል አካውንት ይክፈቱ</strong>:</p>
                                 <div class="credentials-display">
                                     <div class="credential-item">
@@ -794,7 +862,10 @@
                                         <input type="file" id="screenshotInput" accept="image/*" class="form-input" style="margin: 10px 0;" required>
                                         <div id="screenshotPreview" style="margin: 10px 0;"></div>
                                     </div>
-                                    <button type="submit" class="primary-button submit-task-btn" id="submitTaskBtn" disabled style="opacity: 0.5; cursor: not-allowed;">✓ አስረክብ</button>
+                                    <div style="display: flex; gap: 12px;">
+                                        <button type="submit" class="primary-button submit-task-btn" id="submitTaskBtn" disabled style="flex: 1; opacity: 0.5; cursor: not-allowed;">✓ አስረክብ</button>
+                                        <button type="button" class="primary-button" id="returnTaskBtn" style="flex: 1; background-color: #FF6B5B;">↩️ ተመላሽ</button>
+                                    </div>
                                 </form>
                             </div>
                         `;
@@ -834,6 +905,9 @@
                         });
                     }
 
+                    // Start task timer
+                    startTaskTimer();
+
                     // አስረክብ ዝርዝር listener
                     if (taskForm) {
                         taskForm.addEventListener('submit', (e) => {
@@ -871,11 +945,23 @@
                                     status: 'pending'
                                 });
                                 localStorage.setItem('pendingTasks', JSON.stringify(pendingTasks));
+                                localStorage.removeItem('activeTask');
+                                if (taskTimerInterval) clearInterval(taskTimerInterval);
                                 
                                 alert('✅ ተወስዷል!\n⏳ Admin ማፅደቅ ይጠብቁ...');
                                 renderPage('tasks');
                             };
                             reader.readAsDataURL(screenshot);
+                        });
+                    }
+
+                    // Return Task Button listener
+                    const returnTaskBtn = document.getElementById('returnTaskBtn');
+                    if (returnTaskBtn) {
+                        returnTaskBtn.addEventListener('click', () => {
+                            if (confirm('ይህ ተግባር ወደ ክምችት ተመላሽ ስታደርግ እርግጠኛ ነህ?')) {
+                                returnTaskToPool();
+                            }
                         });
                     }
                 });
@@ -886,6 +972,7 @@
             initTelegramApp();
             initializeSampleCredentials();
             initAdminPanel();
+            checkForExpiredTask();
             
             // የኔቪጌሽን አዝራር ክሊክ ተቆጣጣሪ
             const navButtons = document.querySelectorAll('.bottom-nav .nav-item');
@@ -901,6 +988,12 @@
             
             // አዲስ የታስክ መውሰጃ listener
             setupTaskAssignmentListener();
+
+            // Check for active task and restart timer
+            const activeTask = JSON.parse(localStorage.getItem('activeTask') || '{}');
+            if (activeTask.assignedAt) {
+                startTaskTimer();
+            }
         });
     </script>
 </body>
