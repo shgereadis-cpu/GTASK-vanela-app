@@ -33,6 +33,24 @@
         </nav>
     </div>
 
+    <div id="channelJoinModalOverlay" class="admin-modal-overlay" style="display: none;">
+        <div class="admin-modal" style="max-width: 400px;">
+            <button class="close-modal-btn" id="closeChannelModal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
+            <h2>💬 ቻናል ጆይን</h2>
+            <div id="channelJoinContent" style="margin-top: 20px;">
+                <div style="background: rgba(29, 184, 84, 0.1); border-left: 4px solid #1DB854; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                    <p style="margin: 0; color: #A0AEC0; font-size: 14px; line-height: 1.6;">
+                        <strong style="color: #1DB854;">1️⃣ ስልጣኔ</strong><br>ከታች ያለውን ቻናል ጆይን አዝራር ይጫኑ።<br><br>
+                        <strong style="color: #1DB854;">2️⃣ ማረጋገጥ</strong><br>ቻናሉን ከተቀላቀሉ በኋላ "ማረጋገጥ" የሚለውን ይጫኑ።<br><br>
+                        <strong style="color: #1DB854;">3️⃣ ሙያ</strong><br>የ3 ETB ሙያ ታክተዋል!
+                    </p>
+                </div>
+                <button class="primary-button" id="openChannelBtn" style="width: 100%; margin-bottom: 12px;">🔗 ቻናሉን ይክፈቱ</button>
+                <button class="primary-button accent-bg" id="verifyChannelBtn" style="width: 100%;">✅ ማረጋገጥ</button>
+            </div>
+        </div>
+    </div>
+
     <div id="adminModalOverlay" class="admin-modal-overlay" style="display: none;">
         <div class="admin-modal">
             <h2>🔐 Admin Panel</h2>
@@ -190,6 +208,12 @@
                                 <span class="earn-reward">💰 1.00 - 3.00 ETB</span>
                                 <button class="primary-button" style="margin-top: 10px;">ይጀምሩ</button>
                             </div>
+                            <div class="earn-item">
+                                <h3>💬 ቻናል ጆይን</h3>
+                                <p>ቻናላችን ይቀላቀሉ እና ገንዘብ ስኩሙ</p>
+                                <span class="earn-reward">💰 3.00 ETB</span>
+                                <button class="primary-button channel-join-btn" style="margin-top: 10px;">ይጀምሩ</button>
+                            </div>
                         </div>
                     </div>
                  `;
@@ -317,6 +341,18 @@
                     }
                 }, 100);
             }
+
+            // Handle Channel Join Task
+            if (pageName === 'earn') {
+                setTimeout(() => {
+                    const channelJoinBtn = document.querySelector('.channel-join-btn');
+                    if (channelJoinBtn) {
+                        channelJoinBtn.addEventListener('click', () => {
+                            openChannelJoinModal();
+                        });
+                    }
+                }, 100);
+            }
         }
 
         // Admin State
@@ -324,6 +360,86 @@
         const ADMIN_PASSWORD = 'admin123';
         let currentUserIdForTask = null;
         let currentUserReferrerId = null;
+        const CHANNEL_USERNAME = 'gtaskmanager'; // Channel to join
+        const CHANNEL_JOIN_REWARD = 3.00;
+
+        // Channel Join Modal Functions
+        function openChannelJoinModal() {
+            document.getElementById('channelJoinModalOverlay').style.display = 'flex';
+            
+            const openChannelBtn = document.getElementById('openChannelBtn');
+            const verifyChannelBtn = document.getElementById('verifyChannelBtn');
+            const closeChannelModal = document.getElementById('closeChannelModal');
+
+            openChannelBtn.onclick = () => {
+                const channelUrl = `https://t.me/${CHANNEL_USERNAME}`;
+                if (window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.openLink(channelUrl);
+                } else {
+                    window.open(channelUrl, '_blank');
+                }
+            };
+
+            verifyChannelBtn.onclick = () => {
+                verifyChannelMembership();
+            };
+
+            closeChannelModal.onclick = () => {
+                document.getElementById('channelJoinModalOverlay').style.display = 'none';
+            };
+
+            document.getElementById('channelJoinModalOverlay').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('channelJoinModalOverlay')) {
+                    document.getElementById('channelJoinModalOverlay').style.display = 'none';
+                }
+            });
+        }
+
+        function verifyChannelMembership() {
+            const verifyBtn = document.getElementById('verifyChannelBtn');
+            const originalText = verifyBtn.textContent;
+            verifyBtn.textContent = '⏳ ጣቢያ...';
+            verifyBtn.disabled = true;
+
+            // Simulate verification with a delay
+            setTimeout(() => {
+                // Check if user already completed this task
+                const channelJoinsTasks = JSON.parse(localStorage.getItem('channelJoinTasks') || '[]');
+                const userIdForChannel = currentUserIdForTask || 'default_user';
+                
+                if (channelJoinsTasks.includes(userIdForChannel)) {
+                    alert('❌ ይህ ስራ ቀድሞ ተጠናቅቋል');
+                    verifyBtn.textContent = originalText;
+                    verifyBtn.disabled = false;
+                    return;
+                }
+
+                // Add to completed channel join tasks
+                channelJoinsTasks.push(userIdForChannel);
+                localStorage.setItem('channelJoinTasks', JSON.stringify(channelJoinsTasks));
+
+                // Update user balance
+                const currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+                const newBalance = currentBalance + CHANNEL_JOIN_REWARD;
+                localStorage.setItem('userBalance', newBalance.toFixed(2));
+
+                // Record transaction
+                const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+                transactions.push({
+                    type: 'channel_join',
+                    amount: CHANNEL_JOIN_REWARD,
+                    timestamp: new Date().toLocaleString('am-ET'),
+                    status: 'completed'
+                });
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+
+                alert(`✅ ውድድር!\n\n💚 ${CHANNEL_JOIN_REWARD} ETB ታክተዋል`);
+                document.getElementById('channelJoinModalOverlay').style.display = 'none';
+                updateUserBalance();
+                verifyBtn.textContent = originalText;
+                verifyBtn.disabled = false;
+            }, 1500);
+        }
 
         // Gmail ሰነድ ክምችት - ምሳሌ ሰነድ ለሙከራ
         function initializeSampleCredentials() {
