@@ -12,6 +12,8 @@
         // Load bot configuration from server
         let BOT_TOKEN = '';
         let BOT_USERNAME = 'GtaskProVanela_bot';
+        let CURRENT_USER_ID = null;
+        
         fetch('/api/config')
             .then(res => res.json())
             .then(config => {
@@ -22,6 +24,35 @@
             .catch(err => {
                 console.log('ℹ️ Using default bot: @GtaskProVanela_bot');
             });
+        
+        // Fetch user data from backend API
+        async function fetchUserFromBackend(userId) {
+            try {
+                const response = await fetch(`/api/user/${userId}`);
+                if (response.ok) {
+                    return await response.json();
+                }
+                return null;
+            } catch (error) {
+                console.error('Error fetching user from backend:', error);
+                return null;
+            }
+        }
+        
+        // Update user balance display with backend data
+        async function updateBalanceDisplay() {
+            if (!CURRENT_USER_ID) return;
+            
+            const user = await fetchUserFromBackend(CURRENT_USER_ID);
+            if (user) {
+                const balanceDisplay = document.querySelector('.balance-amount');
+                if (balanceDisplay) {
+                    balanceDisplay.textContent = (user.balance || 0).toFixed(2) + ' ETB';
+                }
+                // Also update localStorage for offline support
+                localStorage.setItem('userBalance', (user.balance || 0).toFixed(2));
+            }
+        }
     </script>
 </head>
 <body>
@@ -123,8 +154,16 @@
                 const bgColor = '#F5F5F5'; 
                 window.Telegram.WebApp.setBackgroundColor(bgColor);
                 
-                // Capture referral link start parameter from bot
+                // Capture user ID from Telegram
                 const initData = window.Telegram.WebApp.initDataUnsafe;
+                if (initData && initData.user) {
+                    CURRENT_USER_ID = initData.user.id;
+                    console.log(`✅ User ID set: ${CURRENT_USER_ID}`);
+                    // Fetch user data from backend
+                    updateBalanceDisplay();
+                }
+                
+                // Capture referral link start parameter from bot
                 if (initData && initData.start_param) {
                     handleReferralFromBot(initData.start_param);
                 }
@@ -720,13 +759,31 @@
             });
         }
 
-        function approvePendingTask(taskId) {
+        async function approvePendingTask(taskId) {
             const pendingTasks = JSON.parse(localStorage.getItem('pendingTasks') || '[]');
             const taskIndex = pendingTasks.findIndex(t => t.id === taskId);
             if (taskIndex > -1) {
                 const task = pendingTasks[taskIndex];
                 const mainReward = 10.00;
                 const referralBonus = mainReward * 0.05;
+                
+                // Call backend API to update user balance and record task
+                try {
+                    const response = await fetch('/api/complete-task', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: task.userId || parseInt(localStorage.getItem('userId') || CURRENT_USER_ID),
+                            amount: mainReward,
+                            taskType: 'gmail',
+                            referrerId: task.referrerId || null
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error('Backend API failed');
+                } catch (error) {
+                    console.error('Error calling backend API:', error);
+                }
                 
                 // Remove from pending
                 pendingTasks.splice(taskIndex, 1);
@@ -742,23 +799,10 @@
                 });
                 localStorage.setItem('approvedTasks', JSON.stringify(approvedTasks));
                 
-                // Check if user has a referrer and give them 5% bonus
-                const userReferrals = JSON.parse(localStorage.getItem('userReferrals') || '{}');
-                const referrerUserId = userReferrals[task.userId];
+                // Update balance display
+                await updateBalanceDisplay();
                 
-                if (referrerUserId) {
-                    const referrerBonuses = JSON.parse(localStorage.getItem('referrerBonuses') || '{}');
-                    if (!referrerBonuses[referrerUserId]) {
-                        referrerBonuses[referrerUserId] = 0;
-                    }
-                    referrerBonuses[referrerUserId] += referralBonus;
-                    localStorage.setItem('referrerBonuses', JSON.stringify(referrerBonuses));
-                    
-                    alert('✅ ማፅደቅ ተደርጓል!\n💰 10.00 ETB ተሰጥቷል\n\n📢 Referrer earned: ' + referralBonus.toFixed(2) + ' ETB (5%)');
-                } else {
-                    alert('✅ ማፅደቅ ተደርጓል!\n💰 10.00 ETB ተሰጥቷል');
-                }
-                
+                alert('✅ ማፅደቅ ተደርጓል!\n💰 10.00 ETB ተሰጥቷል\n\n📢 Backend ናቢሊዮ ' + referralBonus.toFixed(2) + ' ETB (5%)');
                 updatePendingTasksList();
             }
         }
@@ -1083,8 +1127,21 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             initTelegramApp();
+            
+            // Fetch and display user balance from backend
+            if (CURRENT_USER_ID) {
+                await updateBalanceDisplay();
+            }
+            
+            // Refresh balance every 30 seconds
+            setInterval(async () => {
+                if (CURRENT_USER_ID) {
+                    await updateBalanceDisplay();
+                }
+            }, 30000);
+            
             initializeSampleCredentials();
             initAdminPanel();
             checkForExpiredTask();
