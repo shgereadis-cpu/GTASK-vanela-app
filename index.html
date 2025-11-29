@@ -583,10 +583,10 @@
         function getUserId() {
             let userId = localStorage.getItem('userId');
             if (!userId) {
-                // Generate numeric ID: timestamp + random number
+                // Generate numeric ID: timestamp + random number (8 digits max)
                 const timestamp = Date.now();
                 const random = Math.floor(Math.random() * 10000);
-                userId = `${timestamp}${random}`.slice(-10); // Last 10 digits
+                userId = `${timestamp}${random}`.slice(-8); // Last 8 digits
                 localStorage.setItem('userId', userId);
             }
             return userId;
