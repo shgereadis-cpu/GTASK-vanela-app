@@ -193,7 +193,8 @@
                     setupTaskAssignmentListener();
                 }, 100);
             } else if (pageName === 'balance') {
-                 const userBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+                 const userId = getUserId();
+                 const userBalance = parseFloat(localStorage.getItem(userId + '_userBalance') || '0');
                  const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
                  let transactionsHTML = '';
                  
@@ -422,8 +423,9 @@
                             }
                             
                             const reward = Math.floor(Math.random() * 3) + 1;
-                            const userBalance = parseFloat(localStorage.getItem('userBalance') || '0');
-                            localStorage.setItem('userBalance', (userBalance + reward).toFixed(2));
+                            const userId = getUserId();
+                            const userBalance = parseFloat(localStorage.getItem(userId + '_userBalance') || '0');
+                            localStorage.setItem(userId + '_userBalance', (userBalance + reward).toFixed(2));
                             localStorage.setItem('lastDailyCheckinTime', now.toString());
                             
                             const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
@@ -527,9 +529,10 @@
                 localStorage.setItem('channelJoinTasks', JSON.stringify(channelJoinsTasks));
 
                 // Update user balance
-                const currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+                const userId = getUserId();
+                const currentBalance = parseFloat(localStorage.getItem(userId + '_userBalance') || '0');
                 const newBalance = currentBalance + CHANNEL_JOIN_REWARD;
-                localStorage.setItem('userBalance', newBalance.toFixed(2));
+                localStorage.setItem(userId + '_userBalance', newBalance.toFixed(2));
 
                 // Record transaction
                 const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
@@ -798,8 +801,9 @@
                 localStorage.setItem('approvedTasks', JSON.stringify(approvedTasks));
                 
                 // Update local balance
-                const userBalance = parseFloat(localStorage.getItem('userBalance') || '0');
-                localStorage.setItem('userBalance', (userBalance + mainReward).toFixed(2));
+                const userId = task.userId || 'unknown';
+                let userBalance = parseFloat(localStorage.getItem(userId + '_userBalance') || '0');
+                localStorage.setItem(userId + '_userBalance', (userBalance + mainReward).toFixed(2));
                 
                 alert('✅ ማፅደቅ ተደርጓል!\n💰 10.00 ETB ተሰጥቷል\n\n📢 Referrer earned: ' + referralBonus.toFixed(2) + ' ETB (5%)');
                 updatePendingTasksList();
