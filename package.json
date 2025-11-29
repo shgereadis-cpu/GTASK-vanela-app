@@ -1,7 +1,7 @@
 {
-  "name": "g-task",
+  "name": "g-task-bot",
   "version": "1.0.0",
-  "description": "G-Task Telegram Mini App with Ethiopian theme - Rebuild with External DB",
+  "description": "G-Task Telegram Bot - Simple Webhook Implementation",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,15 +9,14 @@
   },
   "keywords": [
     "telegram",
-    "mini-app",
-    "task-manager",
-    "ethiopia"
+    "bot",
+    "webhook"
   ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.6.1",
     "express": "^4.21.2",
-    "node-fetch": "^2.7.0",
-    "dotenv": "^16.3.1"
+    "node-fetch": "^2.7.0"
   }
 }
