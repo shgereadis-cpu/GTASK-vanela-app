@@ -375,6 +375,14 @@
                                 return;
                             }
 
+                            // Check if user has sufficient balance
+                            const userId = getUserId();
+                            const userBalance = parseFloat(localStorage.getItem(userId + '_userBalance') || '0');
+                            if (userBalance < parseFloat(amount)) {
+                                alert(`❌ በቂ ሂሳብ የለዎትም!\n\n💰 የእርስዎ ሂሳብ: ${userBalance.toFixed(2)} ETB\n📤 ጠየቁት: ${parseFloat(amount).toFixed(2)} ETB`);
+                                return;
+                            }
+
                             const withdrawalRequest = {
                                 id: 'wd_' + Date.now(),
                                 amount: parseFloat(amount),
