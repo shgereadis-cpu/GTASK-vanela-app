@@ -52,3 +52,8 @@ externalPort = 3000
 [deployment]
 deploymentTarget = "static"
 publicDir = "."
+
+[userenv]
+
+[userenv.shared]
+BOT_TOKEN = "8510640280:AAFoNhM-n2N-4Re9Kjw0Y6MnlE8aqOzlIFU"
