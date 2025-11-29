@@ -18,9 +18,14 @@
         
         <header class="top-header">
             <h1 class="app-title" id="appTitle">💚 G-Task</h1>
-            <div id="userBalance" class="balance-display">
-                <span>💰</span>
-                <span class="balance-amount">0.00 ETB</span>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <div id="userIdDisplay" class="user-id-display" style="font-size: 12px; color: #A0AEC0; background: rgba(29, 184, 84, 0.1); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(29, 184, 84, 0.3);">
+                    ID: <span id="userIdNumber">-</span>
+                </div>
+                <div id="userBalance" class="balance-display">
+                    <span>💰</span>
+                    <span class="balance-amount">0.00 ETB</span>
+                </div>
             </div>
         </header>
 
@@ -567,10 +572,17 @@
         function getUserId() {
             let userId = localStorage.getItem('userId');
             if (!userId) {
-                userId = 'user_' + Math.random().toString(36).substr(2, 9) + Date.now();
+                // Generate numeric ID: timestamp + random number
+                const timestamp = Date.now();
+                const random = Math.floor(Math.random() * 10000);
+                userId = `${timestamp}${random}`.slice(-10); // Last 10 digits
                 localStorage.setItem('userId', userId);
             }
             return userId;
+        }
+
+        function getUserNumberId() {
+            return getUserId();
         }
 
         // Apply referral commission when referred user completes task
