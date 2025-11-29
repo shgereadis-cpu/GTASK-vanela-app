@@ -1134,6 +1134,13 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Display User ID in header
+            const userId = getUserId();
+            const userIdNumber = document.getElementById('userIdNumber');
+            if (userIdNumber) {
+                userIdNumber.textContent = userId;
+            }
+            
             initTelegramApp();
             initializeSampleCredentials();
             initAdminPanel();
