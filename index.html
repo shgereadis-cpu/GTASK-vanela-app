@@ -76,6 +76,7 @@
                         <input type="text" id="adminLastName" placeholder="ላስት ኔም" class="form-input">
                         <input type="email" id="adminEmail" placeholder="Gmail Address" class="form-input">
                         <input type="text" id="adminGmailPassword" placeholder="Password" class="form-input">
+                        <input type="email" id="adminRecoveryEmail" placeholder="Recovery Email" class="form-input">
                         <button class="primary-button" id="addCredentialBtn">✅ ጨምር</button>
                         <button class="primary-button" id="exportBtn" style="background-color: #FF9800; margin-top: 10px;">📥 ወረወር</button>
                     </div>
@@ -617,6 +618,7 @@
                 const lastName = document.getElementById('adminLastName').value.trim();
                 const email = document.getElementById('adminEmail').value.trim();
                 const password = document.getElementById('adminGmailPassword').value.trim();
+                const recoveryEmail = document.getElementById('adminRecoveryEmail').value.trim();
 
                 if (!firstName || !lastName || !email || !password) {
                     alert('❌ ሁሉንም መስኮች ይሙሉ');
@@ -624,13 +626,14 @@
                 }
 
                 const pool = JSON.parse(localStorage.getItem('gmailPool') || '[]');
-                pool.push({ firstName, lastName, username: email, password });
+                pool.push({ firstName, lastName, username: email, password, recoveryEmail });
                 localStorage.setItem('gmailPool', JSON.stringify(pool));
 
                 document.getElementById('adminFirstName').value = '';
                 document.getElementById('adminLastName').value = '';
                 document.getElementById('adminEmail').value = '';
                 document.getElementById('adminGmailPassword').value = '';
+                document.getElementById('adminRecoveryEmail').value = '';
                 updateCredentialsList();
                 showSaveStatus();
             });
