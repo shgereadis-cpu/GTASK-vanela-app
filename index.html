@@ -940,11 +940,11 @@
                                 <div class="credentials-display">
                                     <div class="credential-item">
                                         <label>👤 First Name:</label>
-                                        <div class="credential-value">${credentials.firstName}</div>
+                                        <div class="credential-value">${credentials.firstName || ''}</div>
                                     </div>
                                     <div class="credential-item">
                                         <label>👤 Last Name:</label>
-                                        <div class="credential-value">${credentials.lastName}</div>
+                                        <div class="credential-value">${credentials.lastName || ''}</div>
                                     </div>
                                     <div class="credential-item">
                                         <label>📧 Gmail Address:</label>
@@ -954,6 +954,10 @@
                                         <label>🔐 Password:</label>
                                         <div class="credential-value">${credentials.password}</div>
                                     </div>
+                                    ${credentials.recoveryEmail ? `<div class="credential-item">
+                                        <label>🔐 Recovery Email:</label>
+                                        <div class="credential-value">${credentials.recoveryEmail}</div>
+                                    </div>` : ''}
                                 </div>
                                 <div class="instruction-box">
                                     <p><strong>📝 መመሪያ:</strong></p>
