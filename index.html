@@ -385,6 +385,7 @@
 
                             const withdrawalRequest = {
                                 id: 'wd_' + Date.now(),
+                                userId: userId,
                                 amount: parseFloat(amount),
                                 method: method,
                                 owner: owner,
@@ -397,7 +398,7 @@
                             withdrawals.push(withdrawalRequest);
                             localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawals));
 
-                            alert('✅ ክፍያ ጥያቄዎ ተሰርዝዋል!\n\n⏳ ከ1-24 ሰአታት ይፈፀማሉ');
+                            alert('✅ ክፍያ ጥያቄ ተሰርዟል!\n\n⏳ Admin ማፅደቅ ይጠብቁ');
                             withdrawForm.reset();
                         });
                     }
@@ -842,23 +843,26 @@
             }
 
             withdrawals.forEach((wd, idx) => {
-                const wdDiv = document.createElement('div');
-                wdDiv.className = 'pending-task-item';
-                const methodName = wd.method === 'telebirr' ? '📱 Telebirr' : '🏦 CBE';
-                wdDiv.innerHTML = `
-                    <div style="margin-bottom: 15px; border: 2px solid #FFB800; padding: 15px; border-radius: 8px;">
-                        <h4 style="margin-top: 0; color: #FFB800;">#${idx + 1} - ${wd.owner}</h4>
-                        <p style="font-size: 13px; margin: 5px 0;">💰 Amount: ${wd.amount} ETB</p>
-                        <p style="font-size: 13px; margin: 5px 0;">📱 Method: ${methodName}</p>
-                        <p style="font-size: 13px; margin: 5px 0;">🔢 Account: ${wd.accountNumber}</p>
-                        <p style="font-size: 13px; margin: 5px 0;">⏰ ${wd.requestedAt}</p>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
-                            <button onclick="approveWithdrawal('${wd.id}')" class="primary-button" style="flex: 1; margin: 0;">✅ Approve</button>
-                            <button onclick="rejectWithdrawal('${wd.id}')" class="primary-button accent-bg" style="flex: 1; margin: 0; background: #f44336;">❌ Reject</button>
+                if (wd.status === 'pending') {
+                    const wdDiv = document.createElement('div');
+                    wdDiv.className = 'pending-task-item';
+                    const methodName = wd.method === 'telebirr' ? '📱 Telebirr' : '🏦 CBE';
+                    wdDiv.innerHTML = `
+                        <div style="margin-bottom: 15px; border: 2px solid #FFB800; padding: 15px; border-radius: 8px;">
+                            <h4 style="margin-top: 0; color: #FFB800;">#${idx + 1} - ${wd.owner}</h4>
+                            <p style="font-size: 13px; margin: 5px 0;">👤 User ID: ${wd.userId || 'unknown'}</p>
+                            <p style="font-size: 13px; margin: 5px 0;">💰 Amount: ${wd.amount} ETB</p>
+                            <p style="font-size: 13px; margin: 5px 0;">📱 Method: ${methodName}</p>
+                            <p style="font-size: 13px; margin: 5px 0;">🔢 Account: ${wd.accountNumber}</p>
+                            <p style="font-size: 13px; margin: 5px 0;">⏰ ${wd.requestedAt}</p>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button onclick="approveWithdrawal('${wd.id}')" class="primary-button" style="flex: 1; margin: 0;">✅ Approve</button>
+                                <button onclick="rejectWithdrawal('${wd.id}')" class="primary-button accent-bg" style="flex: 1; margin: 0; background: #f44336;">❌ Reject</button>
+                            </div>
                         </div>
-                    </div>
-                `;
-                listDiv.appendChild(wdDiv);
+                    `;
+                    listDiv.appendChild(wdDiv);
+                }
             });
         }
 
@@ -866,9 +870,21 @@
             const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
             const index = withdrawals.findIndex(w => w.id === wdId);
             if (index > -1) {
-                withdrawals[index].status = 'approved';
+                const withdrawal = withdrawals[index];
+                const userId = withdrawal.userId;
+                const amount = withdrawal.amount;
+                
+                // Deduct balance from user
+                const userBalance = parseFloat(localStorage.getItem(userId + '_userBalance') || '0');
+                const newBalance = userBalance - amount;
+                localStorage.setItem(userId + '_userBalance', newBalance.toFixed(2));
+                
+                // Mark withdrawal as approved
+                withdrawal.status = 'approved';
+                withdrawal.approvedAt = new Date().toLocaleString('am-ET');
                 localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawals));
-                alert('✅ ክፍያ ለሰጠው!');
+                
+                alert(`✅ ክፍያ ለሰጠው!\n\n💰 ${amount} ETB ከUser ${userId} ተቀነሰ`);
                 updateWithdrawalsList();
             }
         }
@@ -878,9 +894,11 @@
                 const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
                 const index = withdrawals.findIndex(w => w.id === wdId);
                 if (index > -1) {
-                    withdrawals.splice(index, 1);
+                    const withdrawal = withdrawals[index];
+                    withdrawal.status = 'rejected';
+                    withdrawal.rejectedAt = new Date().toLocaleString('am-ET');
                     localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawals));
-                    alert('✅ ክፍያ ውድቅ ተደርጓል');
+                    alert(`✅ ክፍያ ውድቅ ተደርጓል\n\nUser ${withdrawal.userId} ሂሳቡ እንደገና ታክሊ ይገባል`);
                     updateWithdrawalsList();
                 }
             }
