@@ -71,6 +71,7 @@
                     <button class="admin-tab active" data-tab="credentials">🔑 Credentials</button>
                     <button class="admin-tab" data-tab="pending">⏳ Pending Tasks</button>
                     <button class="admin-tab" data-tab="withdrawals">💳 Withdrawals</button>
+                    <button class="admin-tab" data-tab="addbalance">💰 Add Balance</button>
                 </div>
 
                 <div class="admin-tab-content" id="credentialsTab" style="display: block;">
@@ -99,6 +100,16 @@
                 <div class="admin-tab-content" id="withdrawalsTab" style="display: none;">
                     <h3>💳 Withdrawal Requests</h3>
                     <div id="withdrawalsList"></div>
+                </div>
+
+                <div class="admin-tab-content" id="addbalanceTab" style="display: none;">
+                    <h3>💰 ለተጠቃሚ ሂሳብ ጨምር</h3>
+                    <div class="admin-form">
+                        <input type="text" id="addBalanceUserId" placeholder="User ID" class="form-input">
+                        <input type="number" id="addBalanceAmount" placeholder="Amount (ETB)" class="form-input" min="0" step="0.01">
+                        <button class="primary-button" id="addBalanceBtn">✅ ጨምር</button>
+                        <div id="addBalanceStatus" class="save-status" style="display: none;"></div>
+                    </div>
                 </div>
 
                 <button class="primary-button accent-bg" id="adminLogoutBtn" style="margin-top: 15px;">ውጣ</button>
@@ -698,9 +709,41 @@
                     } else if (tabName === 'withdrawals') {
                         document.getElementById('withdrawalsTab').style.display = 'block';
                         updateWithdrawalsList();
+                    } else if (tabName === 'addbalance') {
+                        document.getElementById('addbalanceTab').style.display = 'block';
                     }
                 });
             });
+
+            // Add Balance Button
+            const addBalanceBtn = document.getElementById('addBalanceBtn');
+            if (addBalanceBtn) {
+                addBalanceBtn.addEventListener('click', () => {
+                    const userId = document.getElementById('addBalanceUserId').value.trim();
+                    const amount = parseFloat(document.getElementById('addBalanceAmount').value);
+
+                    if (!userId || !amount || amount <= 0) {
+                        alert('❌ User ID እና Amount ይሙሉ');
+                        return;
+                    }
+
+                    // Get current balance for this user ID
+                    let userBalance = parseFloat(localStorage.getItem(userId + '_userBalance') || '0');
+                    userBalance += amount;
+                    localStorage.setItem(userId + '_userBalance', userBalance.toFixed(2));
+
+                    const statusDiv = document.getElementById('addBalanceStatus');
+                    statusDiv.textContent = `✅ ${amount} ETB ለ User ${userId} ታክተዋል!`;
+                    statusDiv.style.display = 'block';
+
+                    document.getElementById('addBalanceUserId').value = '';
+                    document.getElementById('addBalanceAmount').value = '';
+
+                    setTimeout(() => {
+                        statusDiv.style.display = 'none';
+                    }, 3000);
+                });
+            }
         }
 
         function updatePendingTasksList() {
