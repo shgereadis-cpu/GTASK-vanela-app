@@ -263,8 +263,13 @@
                                 <h3>✏️ ስራወች ያርትዩ</h3>
                                 <p>የተደሰተ ስራወች ያርትዩ ወደ ገንዘብ ይቀንሱ</p>
                                 <span class="earn-reward">💰 Variable</span>
-                                <span style="display: inline-block; background: rgba(255, 184, 0, 0.2); border: 1px solid #FFB800; color: #FFB800; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-top: 8px;">🔜 Coming Soon</span>
-                                <button class="primary-button" style="margin-top: 10px; opacity: 0.5; cursor: not-allowed;" disabled>ይጀምሩ</button>
+                                <button class="primary-button edit-tasks-btn" style="margin-top: 10px;">ይጀምሩ</button>
+                            </div>
+                            <div class="earn-item">
+                                <h3>🎵 Tiktok Follow Task</h3>
+                                <p>Follow በማረግ ብቻ ገንዘብ ይስሩ።</p>
+                                <span class="earn-reward">💰 2.00 - 4.00 ETB</span>
+                                <button class="primary-button tiktok-follow-btn" style="margin-top: 10px;">ይጀምሩ</button>
                             </div>
                         </div>
                     </div>
@@ -456,6 +461,49 @@
             // Handle Channel Join Task
             if (pageName === 'earn') {
                 setTimeout(() => {
+                    // Edit Tasks button
+                    const editTasksBtn = document.querySelector('.edit-tasks-btn');
+                    if (editTasksBtn) {
+                        editTasksBtn.addEventListener('click', () => {
+                            alert('✏️ ስራወች ያርትዩ\n\nይህ ሞዱል በቅርቡ ይገባል።');
+                        });
+                    }
+                    
+                    // TikTok Follow button
+                    const tiktokFollowBtn = document.querySelector('.tiktok-follow-btn');
+                    if (tiktokFollowBtn) {
+                        tiktokFollowBtn.addEventListener('click', () => {
+                            const userId = getUserId();
+                            const lastTiktokTime = localStorage.getItem(userId + '_lastTiktokFollowTime');
+                            const now = Date.now();
+                            const TWELVE_HOURS = 12 * 60 * 60 * 1000;
+                            
+                            if (lastTiktokTime) {
+                                const timeSinceLastFollow = now - parseInt(lastTiktokTime);
+                                if (timeSinceLastFollow < TWELVE_HOURS) {
+                                    const hoursRemaining = Math.ceil((TWELVE_HOURS - timeSinceLastFollow) / (60 * 60 * 1000));
+                                    alert(`❌ ቀጠሮ ጊዜ አልደረሰም\n\n⏳ በ${hoursRemaining} ሰአታት ሞክር`);
+                                    return;
+                                }
+                            }
+                            
+                            const reward = Math.floor(Math.random() * 3) + 2;
+                            const userBalance = parseFloat(localStorage.getItem(userId + '_userBalance') || '0');
+                            localStorage.setItem(userId + '_userBalance', (userBalance + reward).toFixed(2));
+                            localStorage.setItem(userId + '_lastTiktokFollowTime', now.toString());
+                            
+                            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+                            transactions.push({
+                                type: 'tiktok_follow',
+                                amount: reward,
+                                timestamp: new Date().toLocaleString('am-ET')
+                            });
+                            localStorage.setItem('transactions', JSON.stringify(transactions));
+                            updateUserBalance();
+                            alert(`✅ ውድ ተጨምር!\n\n💰 +${reward.toFixed(2)} ETB\n\n⏳ 12 ሰአታት በሁዋላ ተጠይቅ`);
+                        });
+                    }
+                    
                     const channelJoinBtn = document.querySelector('.channel-join-btn');
                     if (channelJoinBtn) {
                         channelJoinBtn.addEventListener('click', () => {
