@@ -10,7 +10,7 @@ app.use(express.static('.'));
 
 // ===== Configuration =====
 const BOT_TOKEN = '8510640280:AAFoNhM-n2N-4Re9Kjw0Y6MnlE8aqOzlIFU';
-const ANNOUNCEMENT_CHANNEL_LINK = process.env.ANNOUNCEMENT_CHANNEL_LINK || 'https://t.me/your_channel';
+const ANNOUNCEMENT_CHANNEL_LINK = 'https://t.me/GTASKpro';
 const TELEGRAM_API = 'https://api.telegram.org';
 
 console.log('🔧 Server Configuration:');
