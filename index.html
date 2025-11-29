@@ -573,7 +573,8 @@
         }
 
         function updateUserBalance() {
-            const balance = parseFloat(localStorage.getItem('userBalance') || '0');
+            const userId = getUserId();
+            const balance = parseFloat(localStorage.getItem(userId + '_userBalance') || '0');
             const balanceAmount = document.querySelector('.balance-amount');
             if (balanceAmount) {
                 balanceAmount.textContent = balance.toFixed(2) + ' ETB';
