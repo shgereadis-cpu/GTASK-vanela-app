@@ -161,6 +161,7 @@
         
         // ገጾችን የሚቀይር ተግባር (በVanilla JS)
         function renderPage(pageName) {
+            updateUserBalance(); // Update balance display in header
             const contentArea = document.getElementById('contentArea');
             contentArea.innerHTML = ''; // ያለውን ይዘት ባዶ ማድረግ
 

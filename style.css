@@ -80,19 +80,21 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background: rgba(255, 184, 0, 0.1);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 184, 0, 0.3);
-  font-weight: 600;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(255, 184, 0, 0.15) 0%, rgba(255, 184, 0, 0.05) 100%);
+  border-radius: 14px;
+  border: 2px solid rgba(255, 184, 0, 0.4);
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(255, 184, 0, 0.1);
 }
 
 .balance-amount {
-  background: linear-gradient(135deg, #FFB800 0%, #FFA500 100%);
+  background: linear-gradient(135deg, #FFD700 0%, #FFB800 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-size: 15px;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 /* ========== CONTENT AREA ========== */
