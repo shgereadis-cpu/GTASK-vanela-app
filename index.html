@@ -826,8 +826,12 @@
                 const item = document.createElement('div');
                 item.className = 'credential-pool-item';
                 item.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <p style="margin: 5px 0;"><strong>#${idx + 1}</strong> - ${cred.firstName} ${cred.lastName} (${cred.username})</p>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                        <div style="flex: 1;">
+                            <p style="margin: 5px 0;"><strong>#${idx + 1}</strong> - ${cred.firstName} ${cred.lastName}</p>
+                            <p style="margin: 5px 0; color: #A0AEC0; font-size: 12px;">📧 ${cred.username}</p>
+                            ${cred.recoveryEmail ? `<p style="margin: 5px 0; color: #A0AEC0; font-size: 12px;">🔐 Recovery: ${cred.recoveryEmail}</p>` : ''}
+                        </div>
                         <button class="delete-btn" onclick="deleteCredential(${idx})" style="background: #ff5252; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">ሰርዥ</button>
                     </div>
                 `;
