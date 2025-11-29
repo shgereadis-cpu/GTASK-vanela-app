@@ -9,8 +9,8 @@ app.use(express.static('public'));
 app.use(express.static('.'));
 
 // ===== Configuration =====
-const BOT_TOKEN = process.env.BOT_TOKEN || '';
-const ANNOUNCEMENT_CHANNEL_LINK = process.env.ANNOUNCEMENT_CHANNEL_LINK || '';
+const BOT_TOKEN = '8510640280:AAFoNhM-n2N-4Re9Kjw0Y6MnlE8aqOzlIFU';
+const ANNOUNCEMENT_CHANNEL_LINK = process.env.ANNOUNCEMENT_CHANNEL_LINK || 'https://t.me/your_channel';
 const TELEGRAM_API = 'https://api.telegram.org';
 
 console.log('🔧 Server Configuration:');
