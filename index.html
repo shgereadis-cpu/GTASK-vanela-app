@@ -260,12 +260,6 @@
                                 <button class="primary-button channel-join-btn" style="margin-top: 10px; opacity: 0.5; cursor: not-allowed;" disabled>ይጀምሩ</button>
                             </div>
                             <div class="earn-item">
-                                <h3>✏️ ስራወች ያርትዩ</h3>
-                                <p>የተደሰተ ስራወች ያርትዩ ወደ ገንዘብ ይቀንሱ</p>
-                                <span class="earn-reward">💰 Variable</span>
-                                <button class="primary-button edit-tasks-btn" style="margin-top: 10px;">ይጀምሩ</button>
-                            </div>
-                            <div class="earn-item">
                                 <h3>🎵 Tiktok Follow Task</h3>
                                 <p>Follow በማረግ ብቻ ገንዘብ ይስሩ።</p>
                                 <span class="earn-reward">💰 2.00 - 4.00 ETB</span>
@@ -461,14 +455,6 @@
             // Handle Channel Join Task
             if (pageName === 'earn') {
                 setTimeout(() => {
-                    // Edit Tasks button
-                    const editTasksBtn = document.querySelector('.edit-tasks-btn');
-                    if (editTasksBtn) {
-                        editTasksBtn.addEventListener('click', () => {
-                            alert('✏️ ስራወች ያርትዩ\n\nይህ ሞዱል በቅርቡ ይገባል።');
-                        });
-                    }
-                    
                     // TikTok Follow button
                     const tiktokFollowBtn = document.querySelector('.tiktok-follow-btn');
                     if (tiktokFollowBtn) {
