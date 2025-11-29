@@ -309,6 +309,42 @@
                     </div>
                  `;
             } else if (pageName === 'withdraw') {
+                 const userId = getUserId();
+                 const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+                 const userWithdrawals = withdrawals.filter(w => w.userId === userId);
+                 
+                 let userHistoryHTML = '';
+                 if (userWithdrawals.length === 0) {
+                    userHistoryHTML = '<div style="text-align: center; color: #A0AEC0; padding: 20px;">📭 ገና ክፍያ ጥያቄ አልደረሱም</div>';
+                 } else {
+                    userWithdrawals.slice().reverse().forEach((wd, idx) => {
+                        let statusColor = '#FFB800';
+                        let statusEmoji = '⏳';
+                        if (wd.status === 'frozen') {
+                            statusColor = '#FF6B5B';
+                            statusEmoji = '❄️';
+                        } else if (wd.status === 'approved') {
+                            statusColor = '#10B981';
+                            statusEmoji = '✅';
+                        } else if (wd.status === 'rejected') {
+                            statusColor = '#999';
+                            statusEmoji = '❌';
+                        }
+                        const methodName = wd.method === 'telebirr' ? '📱 ቴሌ ብር' : '🏦 ባንክ';
+                        userHistoryHTML += `
+                            <div style="background: rgba(255, 184, 0, 0.08); border-left: 4px solid ${statusColor}; border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="color: ${statusColor}; font-weight: 700; font-size: 15px;">${statusEmoji} ${wd.amount.toFixed(2)} ETB</div>
+                                        <div style="color: #A0AEC0; font-size: 13px; margin-top: 4px;">${methodName} • ${wd.requestedAt}</div>
+                                    </div>
+                                    <div style="text-align: right; font-size: 12px; color: #A0AEC0;">${wd.status.toUpperCase()}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                 }
+                 
                  contentHTML = `
                     <div class="card">
                         <h2>💳 ገንዘብ ማውጫ</h2>
@@ -347,6 +383,11 @@
 
                                 <button type="submit" class="primary-button accent-bg" style="margin-top: 16px;">💸 ማውጣት ይጠይቁ</button>
                             </form>
+                        </div>
+                        
+                        <h3 style="color: #1DB854; margin-top: 28px; margin-bottom: 16px; font-size: 16px;">📋 የእርስዎ ክፍያ ጥያቄዎች:</h3>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            ${userHistoryHTML}
                         </div>
                     </div>
                  `;
@@ -392,14 +433,20 @@
                                 owner: owner,
                                 accountNumber: accountNum,
                                 requestedAt: new Date().toLocaleString('am-ET'),
-                                status: 'pending'
+                                status: 'frozen'
                             };
 
+                            // Immediately deduct balance
+                            const newBalance = userBalance - parseFloat(amount);
+                            localStorage.setItem(userId + '_userBalance', newBalance.toFixed(2));
+                            
+                            // Store withdrawal request
                             const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
                             withdrawals.push(withdrawalRequest);
                             localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawals));
 
-                            alert('✅ ክፍያ ጥያቄ ወደ አድሚን ተላልፏል !');
+                            alert('✅ ክፍያ ጥያቄ ወደ አድሚን ተላልፏል !\n\n❄️ ሂሳብዎ በፍሪዝ ሁኔታ ውስጥ ይገኛል።\n⏳ Admin ማፅደቅ ይጠብቁ');
+                            updateUserBalance(); // Update header balance immediately
                             withdrawForm.reset();
                         });
                     }
@@ -844,18 +891,19 @@
             }
 
             withdrawals.forEach((wd, idx) => {
-                if (wd.status === 'pending') {
+                if (wd.status === 'frozen') {
                     const wdDiv = document.createElement('div');
                     wdDiv.className = 'pending-task-item';
                     const methodName = wd.method === 'telebirr' ? '📱 Telebirr' : '🏦 CBE';
                     wdDiv.innerHTML = `
                         <div style="margin-bottom: 15px; border: 2px solid #FFB800; padding: 15px; border-radius: 8px;">
-                            <h4 style="margin-top: 0; color: #FFB800;">#${idx + 1} - ${wd.owner}</h4>
+                            <h4 style="margin-top: 0; color: #FFB800;">❄️ #${idx + 1} - ${wd.owner}</h4>
                             <p style="font-size: 13px; margin: 5px 0;">👤 User ID: ${wd.userId || 'unknown'}</p>
                             <p style="font-size: 13px; margin: 5px 0;">💰 Amount: ${wd.amount} ETB</p>
                             <p style="font-size: 13px; margin: 5px 0;">📱 Method: ${methodName}</p>
                             <p style="font-size: 13px; margin: 5px 0;">🔢 Account: ${wd.accountNumber}</p>
                             <p style="font-size: 13px; margin: 5px 0;">⏰ ${wd.requestedAt}</p>
+                            <p style="font-size: 12px; margin: 8px 0; color: #FF6B5B;"><strong>🔒 ሂሳቡ በፍሪዝ ሁኔታ ውስጥ ነው</strong></p>
                             <div style="display: flex; gap: 10px; margin-top: 10px;">
                                 <button onclick="approveWithdrawal('${wd.id}')" class="primary-button" style="flex: 1; margin: 0;">✅ Approve</button>
                                 <button onclick="rejectWithdrawal('${wd.id}')" class="primary-button accent-bg" style="flex: 1; margin: 0; background: #f44336;">❌ Reject</button>
@@ -875,17 +923,12 @@
                 const userId = withdrawal.userId;
                 const amount = withdrawal.amount;
                 
-                // Deduct balance from user
-                const userBalance = parseFloat(localStorage.getItem(userId + '_userBalance') || '0');
-                const newBalance = userBalance - amount;
-                localStorage.setItem(userId + '_userBalance', newBalance.toFixed(2));
-                
-                // Mark withdrawal as approved
+                // Mark withdrawal as approved (balance already deducted when request was made)
                 withdrawal.status = 'approved';
                 withdrawal.approvedAt = new Date().toLocaleString('am-ET');
                 localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawals));
                 
-                alert(`✅ ክፍያ ለሰጠው!\n\n💰 ${amount} ETB ከUser ${userId} ተቀነሰ`);
+                alert(`✅ ክፍያ ለሰጠው!\n\n💰 ${amount} ETB ለUser ${userId} ሰርቷል`);
                 updateWithdrawalsList();
             }
         }
@@ -896,10 +939,18 @@
                 const index = withdrawals.findIndex(w => w.id === wdId);
                 if (index > -1) {
                     const withdrawal = withdrawals[index];
+                    const userId = withdrawal.userId;
+                    const amount = withdrawal.amount;
+                    
+                    // Restore balance to user (it was deducted when request was made)
+                    const userBalance = parseFloat(localStorage.getItem(userId + '_userBalance') || '0');
+                    const restoredBalance = userBalance + amount;
+                    localStorage.setItem(userId + '_userBalance', restoredBalance.toFixed(2));
+                    
                     withdrawal.status = 'rejected';
                     withdrawal.rejectedAt = new Date().toLocaleString('am-ET');
                     localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawals));
-                    alert(`✅ ክፍያ ውድቅ ተደርጓል\n\nUser ${withdrawal.userId} ሂሳቡ እንደገና ታክሊ ይገባል`);
+                    alert(`✅ ክፍያ ውድቅ ተደርጓል\n\nUser ${userId} ሂሳቡ ${amount.toFixed(2)} ETB እንደገና ታክሊ ይገባል`);
                     updateWithdrawalsList();
                 }
             }
